@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { Layout, Button, Dropdown, Avatar, Badge, Switch } from 'antd';
+import { Layout, Input, Button, Dropdown, Avatar, Badge, Switch } from 'antd';
 import {
   SearchOutlined,
   UserOutlined,
@@ -18,14 +18,24 @@ const { Header: AntHeader } = Layout;
 
 const Header = () => {
   const navigate = useNavigate();
+  const [searchText, setSearchText] = useState('');
+  const [searchFocused, setSearchFocused] = useState(false);
   const { user, isAuthenticated, logout } = useAuthStore();
   const { theme, toggleTheme } = useThemeStore();
 
   const isDark = theme === 'dark';
   const bgPrimary = isDark ? '#1e1e1e' : '#ffffff';
+  const bgSecondary = isDark ? '#242424' : '#f5f5f5';
   const borderColor = isDark ? '#2a2a2a' : '#e8e8e8';
   const textColor = isDark ? '#fff' : '#000000';
   const textSecondary = isDark ? '#888' : '#666';
+
+  const handleSearch = () => {
+    if (searchText.trim()) {
+      navigate(`/search?q=${encodeURIComponent(searchText)}`);
+      setSearchText('');
+    }
+  };
 
   const userMenuItems = isAuthenticated ? [
     { key: 'profile', label: <Link to="/profile">个人中心</Link> },
@@ -57,15 +67,64 @@ const Header = () => {
         </div>
       </Link>
 
-      {/* Right Controls */}
-      <div style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
-        {/* Search Icon */}
+      {/* Search Bar - Center */}
+      <div
+        style={{
+          flex: 1,
+          maxWidth: 500,
+          margin: '0 40px',
+          position: 'relative',
+        }}
+      >
+        <Input
+          placeholder="搜索游戏..."
+          value={searchText}
+          onChange={(e) => setSearchText(e.target.value)}
+          onPressEnter={handleSearch}
+          onFocus={() => setSearchFocused(true)}
+          onBlur={() => setSearchFocused(false)}
+          size="large"
+          style={{
+            background: bgSecondary,
+            border: `1px solid ${borderColor}`,
+            borderRadius: 24,
+            height: 44,
+            paddingLeft: 20,
+            paddingRight: 44,
+            transition: 'all 0.3s ease',
+            boxShadow: searchFocused
+              ? isDark
+                ? '0 0 0 2px rgba(255, 71, 87, 0.3), 0 4px 12px rgba(0,0,0,0.3)'
+                : '0 0 0 2px rgba(255, 71, 87, 0.3), 0 4px 12px rgba(0,0,0,0.1)'
+              : 'none',
+            transform: searchFocused ? 'scale(1.02)' : 'scale(1)',
+          }}
+        />
         <Button
           type="text"
-          icon={<SearchOutlined style={{ color: textColor }} />}
-          onClick={() => navigate('/search')}
+          icon={<SearchOutlined style={{ color: textSecondary }} />}
+          onClick={handleSearch}
+          style={{
+            position: 'absolute',
+            right: 4,
+            top: '50%',
+            transform: 'translateY(-50%)',
+            height: 36,
+            width: 36,
+            borderRadius: '50%',
+            background: '#ff4757',
+            border: 'none',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            transition: 'all 0.3s ease',
+            opacity: searchFocused || searchText ? 1 : 0.8,
+          }}
         />
+      </div>
 
+      {/* Right Controls */}
+      <div style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
         {/* Theme Toggle */}
         <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
           <BulbOutlined style={{ color: isDark ? '#888' : '#ffa500', fontSize: 16 }} />

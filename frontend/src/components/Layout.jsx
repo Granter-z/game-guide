@@ -8,6 +8,7 @@ import {
   UserOutlined,
   FireOutlined,
   TrophyOutlined,
+  RobotOutlined,
 } from '@ant-design/icons';
 import Header from './Header';
 import useThemeStore from '../store/themeStore';
@@ -42,6 +43,11 @@ const Layout = () => {
       key: '/profile',
       icon: <UserOutlined />,
       label: <Link to="/profile">个人中心</Link>,
+    },
+    {
+      key: '/chat',
+      icon: <RobotOutlined />,
+      label: <Link to="/chat">AI 推荐</Link>,
     },
     { type: 'divider' },
     {
@@ -99,17 +105,14 @@ const Layout = () => {
         {/* Main Content */}
         <AntLayout
           style={{
-            marginLeft: 0,
-            transition: 'margin-left 0.2s',
             background: bgPrimary,
           }}
-          className="md:ml-[220px]"
         >
           <div
             style={{
               padding: '24px',
-              maxWidth: '1400px',
-              margin: '0 auto',
+              paddingLeft: '244px',
+              minHeight: 'calc(100vh - 64px)',
             }}
           >
             <Outlet />

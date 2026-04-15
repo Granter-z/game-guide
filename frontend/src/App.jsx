@@ -9,6 +9,7 @@ import GameDetail from './pages/GameDetail';
 import Search from './pages/Search';
 import Login from './pages/Login';
 import Profile from './pages/Profile';
+import Chat from './pages/Chat';
 import useThemeStore from './store/themeStore';
 
 const App = () => {
@@ -130,6 +131,7 @@ const App = () => {
             <Route path="search" element={<Search />} />
             <Route path="login" element={<Login />} />
             <Route path="profile" element={<Profile />} />
+            <Route path="chat" element={<Chat />} />
           </Route>
         </Routes>
       </BrowserRouter>

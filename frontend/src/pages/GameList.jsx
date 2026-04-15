@@ -31,7 +31,6 @@ const GameList = () => {
   const ordering = searchParams.get('ordering') || '-metacritic';
   const filters = {
     genres: searchParams.get('genres'),
-    platforms: searchParams.get('platforms'),
     ordering,
     metacritic: searchParams.get('metacritic'),
     search: searchParams.get('q')

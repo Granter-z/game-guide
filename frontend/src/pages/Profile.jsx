@@ -77,14 +77,14 @@ const Profile = () => {
   const userInfo = user || {};
 
   return (
-    <div className="space-y-6">
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 24 }}>
       {/* User Info Card */}
-      <Card className="shadow-sm">
-        <div className="flex items-center gap-4">
-          <Avatar size={64} icon={<UserOutlined />} className="bg-primary" />
+      <Card>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
+          <Avatar size={64} icon={<UserOutlined />} style={{ background: '#ff4757' }} />
           <div>
-            <h2 className="text-xl font-bold mb-1" style={{ color: textColor }}>{userInfo.username || 'User'}</h2>
-            <p className="text-gray-500 mb-2" style={{ color: textSecondary }}>{userInfo.email || ''}</p>
+            <h2 style={{ color: textColor, fontSize: 20, fontWeight: 'bold', margin: '0 0 4px 0' }}>{userInfo.username || 'User'}</h2>
+            <p style={{ color: textSecondary, margin: '0 0 8px 0' }}>{userInfo.email || ''}</p>
             <Button size="small" danger icon={<LogoutOutlined />} onClick={logout}>
               退出登录
             </Button>
@@ -93,7 +93,7 @@ const Profile = () => {
       </Card>
 
       {/* Tabs */}
-      <Card className="shadow-sm">
+      <Card>
         <Tabs
           activeKey={activeTab}
           onChange={setActiveTab}
@@ -110,7 +110,7 @@ const Profile = () => {
                   <Row gutter={[16, 16]}>
                     {favorites.filter(Boolean).map((game) => game && game.gameId ? (
                       <Col key={game.gameId} xs={12} sm={8} md={6} lg={4}>
-                        <div className="relative">
+                        <div style={{ position: 'relative' }}>
                           <GameCard game={{
                             id: game.gameId,
                             slug: game.slug || game.gameId,
@@ -124,7 +124,7 @@ const Profile = () => {
                             type="text"
                             danger
                             size="small"
-                            className="absolute top-2 right-2"
+                            style={{ position: 'absolute', top: 8, right: 8 }}
                             onClick={() => handleRemoveFavorite(game.gameId)}
                           >
                             取消
@@ -145,13 +145,13 @@ const Profile = () => {
                 ratings.length === 0 ? (
                   <Empty description="暂无评分" />
                 ) : (
-                  <div className="space-y-4">
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
                     {ratings.map((rating, index) => (
                       <Card key={index} size="small">
-                        <div className="flex justify-between items-start">
+                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
                           <div>
-                            <h4 className="font-semibold" style={{ color: textColor }}>{rating.gameId}</h4>
-                            <p className="text-gray-500 text-sm">{rating.comment || '无评论'}</p>
+                            <h4 style={{ color: textColor, fontWeight: 600, margin: 0 }}>{rating.gameId}</h4>
+                            <p style={{ color: textSecondary, fontSize: 14, margin: '4px 0 0 0' }}>{rating.comment || '无评论'}</p>
                           </div>
                           <Rate disabled value={rating.score} />
                         </div>

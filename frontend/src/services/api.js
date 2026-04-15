@@ -2,7 +2,7 @@ import axios from 'axios';
 
 const api = axios.create({
   baseURL: '/api',
-  timeout: 15000
+  timeout: 120000
 });
 
 api.interceptors.request.use((config) => {
@@ -28,5 +28,7 @@ export const addFavorite = (gameId, gameData) => api.post('/favorites', { gameId
 export const removeFavorite = (gameId) => api.delete(`/favorites/${gameId}`);
 export const rateGame = (gameId, score, comment) => api.post('/favorites/rate', { gameId, score, comment });
 export const getRatings = () => api.get('/favorites/ratings');
+
+export const chat = (messages) => api.post('/chat', { messages });
 
 export default api;

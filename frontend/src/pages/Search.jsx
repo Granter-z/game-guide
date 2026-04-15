@@ -50,7 +50,7 @@ const Search = () => {
         ? await translateToEnglish(searchQuery)
         : searchQuery;
 
-      const res = await searchGames(englishQuery, 1);
+      const res = await searchGames(englishQuery, 1, '1,18,187');
       setResults(res.data.results || []);
     } catch (error) {
       console.error('Search failed:', error);

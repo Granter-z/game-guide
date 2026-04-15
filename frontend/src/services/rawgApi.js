@@ -13,7 +13,7 @@ const rawgApi = axios.create({
 
 export const getGames = (params) => rawgApi.get('/games', { params });
 export const getGameBySlug = (slug) => rawgApi.get(`/games/${slug}`);
-export const searchGames = (query, page) => rawgApi.get('/games', { params: { search: query, page } });
+export const searchGames = (query, page, platforms) => rawgApi.get('/games', { params: { search: query, page, platforms } });
 export const getGenres = () => rawgApi.get('/genres');
 export const getPlatforms = () => rawgApi.get('/platforms');
 export const getGameDetails = (id) => rawgApi.get(`/games/${id}`);

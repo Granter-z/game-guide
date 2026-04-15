@@ -1,22 +1,31 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { Layout, Input, Button, Dropdown, Avatar } from 'antd';
-import { SearchOutlined, MenuOutlined, UserOutlined, LogoutOutlined, HeartOutlined } from '@ant-design/icons';
+import { Layout, Button, Dropdown, Avatar, Badge, Switch } from 'antd';
+import {
+  SearchOutlined,
+  UserOutlined,
+  LogoutOutlined,
+  HeartOutlined,
+  BellOutlined,
+  PlusOutlined,
+  MenuOutlined,
+  BulbOutlined
+} from '@ant-design/icons';
 import useAuthStore from '../store/authStore';
+import useThemeStore from '../store/themeStore';
 
 const { Header: AntHeader } = Layout;
 
 const Header = () => {
   const navigate = useNavigate();
-  const [searchText, setSearchText] = useState('');
   const { user, isAuthenticated, logout } = useAuthStore();
+  const { theme, toggleTheme } = useThemeStore();
 
-  const handleSearch = () => {
-    if (searchText.trim()) {
-      navigate(`/search?q=${encodeURIComponent(searchText)}`);
-      setSearchText('');
-    }
-  };
+  const isDark = theme === 'dark';
+  const bgPrimary = isDark ? '#1e1e1e' : '#ffffff';
+  const borderColor = isDark ? '#2a2a2a' : '#e8e8e8';
+  const textColor = isDark ? '#fff' : '#000000';
+  const textSecondary = isDark ? '#888' : '#666';
 
   const userMenuItems = isAuthenticated ? [
     { key: 'profile', label: <Link to="/profile">个人中心</Link> },
@@ -28,38 +37,88 @@ const Header = () => {
   ];
 
   return (
-    <AntHeader className="sticky top-0 z-50 flex items-center justify-between px-4 md:px-8 bg-white shadow-md">
-      <div className="flex items-center gap-4 md:gap-8">
-        <Link to="/" className="text-xl font-bold text-primary">
-          游戏图鉴
-        </Link>
-        <nav className="hidden md:flex gap-6">
-          <Link to="/" className="text-gray-700 hover:text-primary transition-colors">首页</Link>
-          <Link to="/games" className="text-gray-700 hover:text-primary transition-colors">游戏列表</Link>
-          <Link to="/search" className="text-gray-700 hover:text-primary transition-colors">搜索</Link>
-        </nav>
-      </div>
+    <AntHeader
+      className="sticky top-0 z-50"
+      style={{
+        background: bgPrimary,
+        borderBottom: `1px solid ${borderColor}`,
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'space-between',
+        padding: '0 24px',
+        height: 64,
+      }}
+    >
+      {/* Logo */}
+      <Link to="/" style={{ textDecoration: 'none' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+          <span style={{ fontSize: 22, fontWeight: 700, color: textColor }}>RAWG</span>
+          <span style={{ fontSize: 12, color: textSecondary, marginLeft: 4 }}>游戏图鉴</span>
+        </div>
+      </Link>
 
-      <div className="flex items-center gap-4">
-        <Input
-          placeholder="搜索游戏..."
-          prefix={<SearchOutlined />}
-          value={searchText}
-          onChange={(e) => setSearchText(e.target.value)}
-          onPressEnter={handleSearch}
-          className="w-48 md:w-64"
+      {/* Right Controls */}
+      <div style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
+        {/* Search Icon */}
+        <Button
+          type="text"
+          icon={<SearchOutlined style={{ color: textColor }} />}
+          onClick={() => navigate('/search')}
         />
 
+        {/* Theme Toggle */}
+        <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+          <BulbOutlined style={{ color: isDark ? '#888' : '#ffa500', fontSize: 16 }} />
+          <Switch
+            checked={isDark}
+            onChange={toggleTheme}
+            checkedChildren="🌙"
+            unCheckedChildren="☀️"
+            size="small"
+          />
+        </div>
+
+        {/* Add Button */}
+        <Button
+          type="text"
+          icon={<PlusOutlined style={{ color: textColor }} />}
+        />
+
+        {/* Notifications */}
+        <Badge count={1} size="small">
+          <Button
+            type="text"
+            icon={<BellOutlined style={{ color: textColor, fontSize: 18 }} />}
+          />
+        </Badge>
+
+        {/* User Menu */}
         <Dropdown menu={{ items: userMenuItems }} placement="bottomRight">
-          <Button type="text" className="flex items-center gap-2">
-            <Avatar size="small" icon={<UserOutlined />} />
-            <span className="hidden md:inline">{isAuthenticated ? user?.username : '登录'}</span>
+          <Button
+            type="text"
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: 8,
+              padding: '4px 12px',
+              height: 'auto',
+            }}
+          >
+            <Avatar
+              size={32}
+              icon={<UserOutlined />}
+              style={{ background: '#ff4757' }}
+            />
+            <span style={{ color: textColor }}>
+              {isAuthenticated ? user?.username : '登录'}
+            </span>
           </Button>
         </Dropdown>
 
+        {/* Mobile Menu */}
         <Button
           type="text"
-          icon={<MenuOutlined />}
+          icon={<MenuOutlined style={{ color: textColor }} />}
           className="md:hidden"
           onClick={() => navigate('/games')}
         />

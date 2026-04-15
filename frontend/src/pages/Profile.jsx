@@ -3,14 +3,20 @@ import { Card, Row, Col, Empty, Spin, Tabs, Button, Rate, message, Avatar } from
 import { HeartOutlined, StarOutlined, UserOutlined, LogoutOutlined } from '@ant-design/icons';
 import { getFavorites, removeFavorite, getRatings, getMe } from '../services/api';
 import useAuthStore from '../store/authStore';
+import useThemeStore from '../store/themeStore';
 import GameCard from '../components/GameCard';
 
 const Profile = () => {
   const { user, isAuthenticated, logout } = useAuthStore();
+  const { theme } = useThemeStore();
+  const isDark = theme === 'dark';
   const [favorites, setFavorites] = useState([]);
   const [ratings, setRatings] = useState([]);
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState('favorites');
+
+  const textColor = isDark ? '#ffffff' : '#000000';
+  const textSecondary = isDark ? '#a0a0a0' : '#666666';
 
   useEffect(() => {
     if (isAuthenticated) {
@@ -77,8 +83,8 @@ const Profile = () => {
         <div className="flex items-center gap-4">
           <Avatar size={64} icon={<UserOutlined />} className="bg-primary" />
           <div>
-            <h2 className="text-xl font-bold mb-1">{userInfo.username || 'User'}</h2>
-            <p className="text-gray-500 mb-2">{userInfo.email || ''}</p>
+            <h2 className="text-xl font-bold mb-1" style={{ color: textColor }}>{userInfo.username || 'User'}</h2>
+            <p className="text-gray-500 mb-2" style={{ color: textSecondary }}>{userInfo.email || ''}</p>
             <Button size="small" danger icon={<LogoutOutlined />} onClick={logout}>
               退出登录
             </Button>
@@ -95,14 +101,14 @@ const Profile = () => {
             {
               key: 'favorites',
               label: (
-                <span><HeartOutlined /> 我的收藏 ({favorites.length})</span>
+                <span style={{ color: activeTab === 'favorites' ? textColor : textSecondary }}><HeartOutlined /> 我的收藏 ({favorites.length})</span>
               ),
               children: (
                 favorites.length === 0 ? (
                   <Empty description="暂无收藏" />
                 ) : (
                   <Row gutter={[16, 16]}>
-                    {favorites.map((game) => (
+                    {favorites.filter(Boolean).map((game) => game && game.gameId ? (
                       <Col key={game.gameId} xs={12} sm={8} md={6} lg={4}>
                         <div className="relative">
                           <GameCard game={{
@@ -125,7 +131,7 @@ const Profile = () => {
                           </Button>
                         </div>
                       </Col>
-                    ))}
+                    ) : null)}
                   </Row>
                 )
               )
@@ -133,7 +139,7 @@ const Profile = () => {
             {
               key: 'ratings',
               label: (
-                <span><StarOutlined /> 我的评分 ({ratings.length})</span>
+                <span style={{ color: activeTab === 'ratings' ? textColor : textSecondary }}><StarOutlined /> 我的评分 ({ratings.length})</span>
               ),
               children: (
                 ratings.length === 0 ? (
@@ -144,7 +150,7 @@ const Profile = () => {
                       <Card key={index} size="small">
                         <div className="flex justify-between items-start">
                           <div>
-                            <h4 className="font-semibold">{rating.gameId}</h4>
+                            <h4 className="font-semibold" style={{ color: textColor }}>{rating.gameId}</h4>
                             <p className="text-gray-500 text-sm">{rating.comment || '无评论'}</p>
                           </div>
                           <Rate disabled value={rating.score} />

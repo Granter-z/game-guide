@@ -1,17 +1,23 @@
 import React, { useState, useEffect } from 'react';
-import { Select, DatePicker, Slider, Button, Space } from 'antd';
+import { Select, Slider, Button, Space } from 'antd';
 import { FilterOutlined, ClearOutlined } from '@ant-design/icons';
 import { getGenres, getPlatforms } from '../services/rawgApi';
-
-const { RangePicker } = DatePicker;
+import useThemeStore from '../store/themeStore';
 
 const GameFilter = ({ onFilterChange, loading }) => {
   const [genres, setGenres] = useState([]);
   const [platforms, setPlatforms] = useState([]);
   const [selectedGenre, setSelectedGenre] = useState(null);
   const [selectedPlatform, setSelectedPlatform] = useState(null);
-  const [ordering, setOrdering] = useState(null);
   const [metacriticRange, setMetacriticRange] = useState([0, 100]);
+  const { theme } = useThemeStore();
+  const isDark = theme === 'dark';
+
+  const bgPrimary = isDark ? '#1e1e1e' : '#ffffff';
+  const bgSecondary = isDark ? '#242424' : '#f5f5f5';
+  const borderColor = isDark ? '#333' : '#e8e8e8';
+  const textColor = isDark ? '#ffffff' : '#000000';
+  const textSecondary = isDark ? '#888' : '#666666';
 
   useEffect(() => {
     const fetchFilters = async () => {
@@ -30,7 +36,6 @@ const GameFilter = ({ onFilterChange, loading }) => {
     const filters = {};
     if (selectedGenre) filters.genres = selectedGenre;
     if (selectedPlatform) filters.platforms = selectedPlatform;
-    if (ordering) filters.ordering = ordering;
     if (metacriticRange[0] > 0 || metacriticRange[1] < 100) {
       filters.metacritic = `${metacriticRange[0]},${metacriticRange[1]}`;
     }
@@ -40,27 +45,33 @@ const GameFilter = ({ onFilterChange, loading }) => {
   const clearFilters = () => {
     setSelectedGenre(null);
     setSelectedPlatform(null);
-    setOrdering(null);
     setMetacriticRange([0, 100]);
     onFilterChange({});
   };
 
-  const orderingOptions = [
-    { value: '-metacritic', label: '评分最高' },
-    { value: '-released', label: '最新发布' },
-    { value: '-added', label: '最受欢迎' },
-    { value: 'name', label: '名称 A-Z' },
-    { value: '-rating', label: '热门推荐' }
-  ];
-
   return (
-    <div className="bg-white p-4 rounded-lg shadow-sm mb-6">
-      <div className="flex items-center gap-2 mb-4">
-        <FilterOutlined />
-        <span className="font-semibold">筛选条件</span>
+    <div
+      style={{
+        background: bgPrimary,
+        borderRadius: 12,
+        padding: 16,
+        marginBottom: 20,
+        border: isDark ? undefined : '1px solid #e8e8e8',
+      }}
+    >
+      <div
+        style={{
+          display: 'flex',
+          alignItems: 'center',
+          gap: 8,
+          marginBottom: 16,
+        }}
+      >
+        <FilterOutlined style={{ color: textSecondary }} />
+        <span style={{ color: textSecondary, fontSize: 14 }}>筛选条件</span>
       </div>
 
-      <Space wrap className="w-full">
+      <Space wrap size={12}>
         <Select
           placeholder="游戏类型"
           allowClear
@@ -76,36 +87,46 @@ const GameFilter = ({ onFilterChange, loading }) => {
           style={{ width: 160 }}
           value={selectedPlatform}
           onChange={setSelectedPlatform}
-          options={platforms.map(p => ({ value: p.id, label: p.name }))}
+          options={platforms.map(p => ({ value: p.id.toString(), label: p.name }))}
         />
 
-        <Select
-          placeholder="排序方式"
-          allowClear
-          style={{ width: 160 }}
-          value={ordering}
-          onChange={setOrdering}
-          options={orderingOptions}
-        />
-
-        <div className="flex items-center gap-2">
-          <span className="text-sm text-gray-500">评分:</span>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+          <span style={{ color: textSecondary, fontSize: 13 }}>评分:</span>
           <Slider
             range
             min={0}
             max={100}
             value={metacriticRange}
             onChange={setMetacriticRange}
-            style={{ width: 120 }}
+            style={{ width: 100 }}
           />
-          <span className="text-sm text-gray-500">{metacriticRange[0]}-{metacriticRange[1]}</span>
+          <span style={{ color: textSecondary, fontSize: 12, minWidth: 45 }}>
+            {metacriticRange[0]}-{metacriticRange[1]}
+          </span>
         </div>
 
-        <Button type="primary" onClick={handleFilterChange} loading={loading}>
+        <Button
+          type="primary"
+          onClick={handleFilterChange}
+          loading={loading}
+          style={{
+            background: '#ff4757',
+            border: 'none',
+            borderRadius: 6,
+          }}
+        >
           应用筛选
         </Button>
 
-        <Button onClick={clearFilters}>
+        <Button
+          onClick={clearFilters}
+          style={{
+            background: bgSecondary,
+            border: `1px solid ${borderColor}`,
+            color: textSecondary,
+            borderRadius: 6,
+          }}
+        >
           <ClearOutlined /> 清空
         </Button>
       </Space>

@@ -1,30 +1,42 @@
-import React, { useEffect, useState } from 'react';
-import { Link } from 'react-router-dom';
-import { Carousel, Card, Row, Col, Typography, Spin } from 'antd';
-import { RightOutlined, TrophyOutlined, FireOutlined, RocketOutlined } from '@ant-design/icons';
+import React, { useEffect, useState, useRef, useCallback } from 'react';
+import { Row, Col, Spin, Select } from 'antd';
 import { getGames } from '../services/rawgApi';
 import GameCard from '../components/GameCard';
+import useThemeStore from '../store/themeStore';
 
-const { Title, Paragraph } = Typography;
+const ORDERINGS = [
+  { value: '-added', label: '最受关注' },
+  { value: '-metacritic', label: '评分最高' },
+  { value: '-released', label: '最近发布' },
+  { value: '-rating', label: '评分最佳' },
+  { value: '-name', label: '名称 A-Z' },
+];
 
 const Home = () => {
-  const [featuredGames, setFeaturedGames] = useState([]);
-  const [popularGames, setPopularGames] = useState([]);
-  const [newGames, setNewGames] = useState([]);
+  const { theme } = useThemeStore();
+  const isDark = theme === 'dark';
+  const [games, setGames] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [loadingMore, setLoadingMore] = useState(false);
+  const [page, setPage] = useState(1);
+  const [hasMore, setHasMore] = useState(true);
+  const [ordering, setOrdering] = useState('-added');
 
+  const observerRef = useRef();
+  const lastGameRef = useRef(null);
+
+  const textColor = isDark ? '#fff' : '#000';
+  const textSecondary = isDark ? '#666' : '#666';
+
+  // Fetch games when ordering changes
   useEffect(() => {
     const fetchGames = async () => {
       try {
         setLoading(true);
-        const [featured, popular, newGamesRes] = await Promise.all([
-          getGames({ page_size: 5, ordering: '-metacritic' }),
-          getGames({ page_size: 8, ordering: '-added' }),
-          getGames({ page_size: 8, ordering: '-released' })
-        ]);
-        setFeaturedGames(featured.data.results || []);
-        setPopularGames(popular.data.results || []);
-        setNewGames(newGamesRes.data.results || []);
+        setPage(1);
+        const res = await getGames({ page: 1, page_size: 20, ordering });
+        setGames(res.data.results || []);
+        setHasMore(res.data.results?.length === 20);
       } catch (error) {
         console.error('Failed to fetch games:', error);
       } finally {
@@ -32,117 +44,128 @@ const Home = () => {
       }
     };
     fetchGames();
-  }, []);
+  }, [ordering]);
+
+  // Load more games
+  const loadMore = useCallback(async () => {
+    if (loadingMore || !hasMore) return;
+
+    try {
+      setLoadingMore(true);
+      const nextPage = page + 1;
+      const res = await getGames({ page: nextPage, page_size: 20, ordering });
+      const newGames = res.data.results || [];
+
+      if (newGames.length === 0) {
+        setHasMore(false);
+      } else {
+        setGames(prev => [...prev, ...newGames]);
+        setPage(nextPage);
+        setHasMore(newGames.length === 20);
+      }
+    } catch (error) {
+      console.error('Failed to load more:', error);
+    } finally {
+      setLoadingMore(false);
+    }
+  }, [page, loadingMore, hasMore, ordering]);
+
+  // Intersection Observer
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      (entries) => {
+        if (entries[0].isIntersecting && hasMore && !loadingMore) {
+          loadMore();
+        }
+      },
+      { rootMargin: '200px', threshold: 0 }
+    );
+
+    if (lastGameRef.current) {
+      observer.observe(lastGameRef.current);
+    }
+
+    return () => observer.disconnect();
+  }, [loadMore, hasMore, loadingMore]);
+
+  // Update last element ref when games change
+  useEffect(() => {
+    if (games.length > 0 && lastGameRef.current) {
+      observerRef.current?.disconnect();
+      observerRef.current = new IntersectionObserver(
+        (entries) => {
+          if (entries[0].isIntersecting && hasMore && !loadingMore) {
+            loadMore();
+          }
+        },
+        { rootMargin: '200px', threshold: 0 }
+      );
+      observerRef.current.observe(lastGameRef.current);
+    }
+  }, [games.length, loadMore, hasMore, loadingMore]);
 
   if (loading) {
     return (
-      <div className="flex justify-center items-center h-64">
+      <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '60vh' }}>
         <Spin size="large" />
       </div>
     );
   }
 
   return (
-    <div className="space-y-8">
-      {/* Hero Banner */}
-      <Carousel autoplay className="rounded-lg overflow-hidden shadow-lg">
-        {featuredGames.slice(0, 3).map((game) => (
-          <div key={game.id}>
-            <Link to={`/games/${game.slug}`}>
-              <div
-                className="h-64 md:h-96 bg-cover bg-center flex items-end"
-                style={{
-                  backgroundImage: `linear-gradient(transparent, rgba(0,0,0,0.8)), url(${game.background_image})`
-                }}
-              >
-                <div className="p-6 md:p-10 text-white w-full md:w-2/3">
-                  <h2 className="text-2xl md:text-4xl font-bold mb-2">{game.name}</h2>
-                  <p className="text-sm md:text-base text-gray-200 mb-2">
-                    {game.genres?.map(g => g.name).join(' · ')}
-                  </p>
-                  <div className="flex gap-4">
-                    {game.metacritic && (
-                      <span className="bg-green-500 px-3 py-1 rounded font-bold">
-                        Metacritic: {game.metacritic}
-                      </span>
-                    )}
-                    {game.released && (
-                      <span className="bg-white/20 px-3 py-1 rounded">
-                        {game.released}
-                      </span>
-                    )}
-                  </div>
-                </div>
-              </div>
-            </Link>
-          </div>
-        ))}
-      </Carousel>
+    <div>
+      {/* Header */}
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 24 }}>
+        <div>
+          <h1 style={{ color: textColor, fontSize: 28, fontWeight: 700, margin: 0 }}>
+            新潮与趋势
+          </h1>
+          <p style={{ color: textSecondary, fontSize: 13, margin: '8px 0 0 0' }}>
+            基于玩家游玩、评分和讨论数据
+          </p>
+        </div>
+        <Select
+          value={ordering}
+          onChange={setOrdering}
+          options={ORDERINGS}
+          style={{ width: 140 }}
+        />
+      </div>
 
-      {/* Categories Quick Access */}
-      <Row gutter={16}>
-        <Col xs={24} sm={8}>
-          <Link to="/games?genres=action">
-            <Card hoverable className="text-center bg-gradient-to-r from-red-500 to-orange-500 text-white">
-              <FireOutlined className="text-4xl mb-2" />
-              <Title level={4} className="text-white mb-0">动作游戏</Title>
-              <Paragraph className="text-white/80 mb-0">紧张刺激的战斗体验</Paragraph>
-            </Card>
-          </Link>
-        </Col>
-        <Col xs={24} sm={8}>
-          <Link to="/games?genres=role-playing-games-rpg">
-            <Card hoverable className="text-center bg-gradient-to-r from-purple-500 to-pink-500 text-white">
-              <TrophyOutlined className="text-4xl mb-2" />
-              <Title level={4} className="text-white mb-0">角色扮演</Title>
-              <Paragraph className="text-white/80 mb-0">史诗般的冒险故事</Paragraph>
-            </Card>
-          </Link>
-        </Col>
-        <Col xs={24} sm={8}>
-          <Link to="/games?genres=indie">
-            <Card hoverable className="text-center bg-gradient-to-r from-blue-500 to-cyan-500 text-white">
-              <RocketOutlined className="text-4xl mb-2" />
-              <Title level={4} className="text-white mb-0">独立游戏</Title>
-              <Paragraph className="text-white/80 mb-0">创意无限的精品游戏</Paragraph>
-            </Card>
-          </Link>
-        </Col>
+      {/* Game Grid */}
+      <Row gutter={[16, 16]}>
+        {games.map((game, index) => {
+          const isLast = index === games.length - 1;
+          return (
+            <Col
+              key={`${game.id}-${index}`}
+              xs={12}
+              sm={8}
+              md={6}
+              lg={4}
+              xl={3}
+            >
+              <div ref={isLast ? lastGameRef : null}>
+                <GameCard game={game} />
+              </div>
+            </Col>
+          );
+        })}
       </Row>
 
-      {/* Popular Games */}
-      <section>
-        <div className="flex items-center justify-between mb-4">
-          <Title level={3} className="mb-0">热门游戏</Title>
-          <Link to="/games?ordering=-added" className="flex items-center text-primary">
-            查看更多 <RightOutlined />
-          </Link>
+      {/* Loading Indicator */}
+      {loadingMore && (
+        <div style={{ textAlign: 'center', padding: 40 }}>
+          <Spin size="large" />
         </div>
-        <Row gutter={[16, 16]}>
-          {popularGames.map((game) => (
-            <Col key={game.id} xs={12} sm={8} md={6} lg={4}>
-              <GameCard game={game} />
-            </Col>
-          ))}
-        </Row>
-      </section>
+      )}
 
-      {/* New Games */}
-      <section>
-        <div className="flex items-center justify-between mb-4">
-          <Title level={3} className="mb-0">最新发布</Title>
-          <Link to="/games?ordering=-released" className="flex items-center text-primary">
-            查看更多 <RightOutlined />
-          </Link>
+      {/* End Message */}
+      {!hasMore && games.length > 0 && (
+        <div style={{ textAlign: 'center', padding: 40, color: textSecondary }}>
+          已加载全部 {games.length} 款游戏
         </div>
-        <Row gutter={[16, 16]}>
-          {newGames.map((game) => (
-            <Col key={game.id} xs={12} sm={8} md={6} lg={4}>
-              <GameCard game={game} />
-            </Col>
-          ))}
-        </Row>
-      </section>
+      )}
     </div>
   );
 };

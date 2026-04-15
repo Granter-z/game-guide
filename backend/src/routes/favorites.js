@@ -5,7 +5,7 @@ const auth = require('../middleware/auth');
 
 router.get('/', auth, async (req, res) => {
   try {
-    const user = await User.findById(req.user.id).populate('favorites');
+    const user = await User.findById(req.user.id);
     res.json(user.favorites || []);
   } catch (error) {
     res.status(500).json({ message: 'Failed to fetch favorites', error: error.message });
@@ -17,11 +17,11 @@ router.post('/', auth, async (req, res) => {
     const { gameId, gameData } = req.body;
     const user = await User.findById(req.user.id);
 
-    if (user.favorites.includes(gameId)) {
+    if (user.favorites.some(f => f.gameId === gameId)) {
       return res.status(400).json({ message: 'Game already in favorites' });
     }
 
-    user.favorites.push(gameId);
+    user.favorites.push({ ...gameData, gameId });
     await user.save();
 
     res.json({ message: 'Added to favorites', favorites: user.favorites });
@@ -33,7 +33,7 @@ router.post('/', auth, async (req, res) => {
 router.delete('/:gameId', auth, async (req, res) => {
   try {
     const user = await User.findById(req.user.id);
-    user.favorites = user.favorites.filter(f => f.toString() !== req.params.gameId);
+    user.favorites = user.favorites.filter(f => f.gameId.toString() !== req.params.gameId);
     await user.save();
 
     res.json({ message: 'Removed from favorites', favorites: user.favorites });

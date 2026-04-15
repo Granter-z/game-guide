@@ -1,13 +1,16 @@
 import React, { useState } from 'react';
-import { useNavigate, Link } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { Form, Input, Button, Card, message, Tabs } from 'antd';
 import { UserOutlined, LockOutlined, MailOutlined } from '@ant-design/icons';
 import { login, register } from '../services/api';
 import useAuthStore from '../store/authStore';
+import useThemeStore from '../store/themeStore';
 
 const Login = () => {
   const navigate = useNavigate();
   const { setToken, setUser } = useAuthStore();
+  const { theme } = useThemeStore();
+  const isDark = theme === 'dark';
   const [loading, setLoading] = useState(false);
 
   const handleLogin = async (values) => {

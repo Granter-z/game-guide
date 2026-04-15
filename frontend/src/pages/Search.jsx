@@ -1,10 +1,11 @@
 import React, { useEffect, useState } from 'react';
-import { useSearchParams, Link } from 'react-router-dom';
-import { Input, Row, Col, Card, Spin, Empty, Typography, Tag } from 'antd';
+import { useSearchParams } from 'react-router-dom';
+import { Input, Row, Col, Spin, Empty, Typography } from 'antd';
 import { SearchOutlined } from '@ant-design/icons';
-import { searchGames, getGames } from '../services/rawgApi';
+import { searchGames } from '../services/rawgApi';
 import api from '../services/api';
 import GameCard from '../components/GameCard';
+import useThemeStore from '../store/themeStore';
 
 const { Title, Text } = Typography;
 
@@ -15,6 +16,11 @@ const Search = () => {
   const [results, setResults] = useState([]);
   const [loading, setLoading] = useState(false);
   const [searched, setSearched] = useState(false);
+  const { theme } = useThemeStore();
+  const isDark = theme === 'dark';
+
+  const textColor = isDark ? '#ffffff' : '#000000';
+  const textSecondary = isDark ? '#a0a0a0' : '#666666';
 
   useEffect(() => {
     if (query) {
@@ -60,32 +66,42 @@ const Search = () => {
   };
 
   return (
-    <div className="space-y-6">
-      <Title level={2}>搜索游戏</Title>
+    <div>
+      <div style={{ marginBottom: 24 }}>
+        <Title level={2} style={{ color: textColor, marginBottom: 16 }}>
+          搜索游戏
+        </Title>
 
-      <Input.Search
-        placeholder="输入游戏名称进行搜索..."
-        size="large"
-        value={inputValue}
-        onChange={(e) => setInputValue(e.target.value)}
-        onSearch={handleSearch}
-        enterButton={<SearchOutlined />}
-        className="max-w-2xl"
-      />
+        <Input.Search
+          placeholder="输入游戏名称进行搜索..."
+          size="large"
+          value={inputValue}
+          onChange={(e) => setInputValue(e.target.value)}
+          onSearch={handleSearch}
+          enterButton={<SearchOutlined />}
+          style={{ maxWidth: 600 }}
+        />
+      </div>
 
       {loading ? (
-        <div className="flex justify-center items-center h-64">
+        <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: 300 }}>
           <Spin size="large" />
         </div>
       ) : searched ? (
         results.length === 0 ? (
-          <Empty description={`未找到与 "${query}" 相关的游戏`} />
+          <Empty
+            description={
+              <span style={{ color: textSecondary }}>
+                未找到与 "{query}" 相关的游戏
+              </span>
+            }
+          />
         ) : (
-          <div className="space-y-4">
-            <Text className="text-gray-500">
+          <div>
+            <Text style={{ color: textSecondary, fontSize: 14 }}>
               找到 {results.length} 个与 "{query}" 相关的游戏
             </Text>
-            <Row gutter={[16, 16]}>
+            <Row gutter={[16, 16]} style={{ marginTop: 16 }}>
               {results.map((game) => (
                 <Col key={game.id} xs={12} sm={8} md={6} lg={4}>
                   <GameCard game={game} />
@@ -95,9 +111,9 @@ const Search = () => {
           </div>
         )
       ) : (
-        <div className="text-center text-gray-400 py-12">
-          <SearchOutlined className="text-5xl mb-4" />
-          <p>输入关键词搜索游戏</p>
+        <div style={{ textAlign: 'center', padding: '60px 0' }}>
+          <SearchOutlined style={{ fontSize: 48, color: textSecondary, marginBottom: 16 }} />
+          <p style={{ color: textSecondary, fontSize: 16 }}>输入关键词搜索游戏</p>
         </div>
       )}
     </div>

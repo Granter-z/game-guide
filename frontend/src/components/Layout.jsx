@@ -1,32 +1,121 @@
 import React from 'react';
-import { Outlet, Link } from 'react-router-dom';
+import { Outlet, Link, useLocation } from 'react-router-dom';
 import { Layout as AntLayout, Menu } from 'antd';
-import { HomeOutlined, AppstoreOutlined, SearchOutlined, UserOutlined, HeartOutlined } from '@ant-design/icons';
+import {
+  HomeOutlined,
+  AppstoreOutlined,
+  SearchOutlined,
+  UserOutlined,
+  FireOutlined,
+  TrophyOutlined,
+} from '@ant-design/icons';
 import Header from './Header';
+import useThemeStore from '../store/themeStore';
 
-const { Content, Footer } = AntLayout;
+const { Sider } = AntLayout;
 
 const Layout = () => {
-  const items = [
-    { key: '/', icon: <HomeOutlined />, label: <Link to="/">首页</Link> },
-    { key: '/games', icon: <AppstoreOutlined />, label: <Link to="/games">游戏列表</Link> },
-    { key: '/search', icon: <SearchOutlined />, label: <Link to="/search">搜索</Link> },
-    { key: '/profile', icon: <UserOutlined />, label: <Link to="/profile">个人中心</Link> }
+  const location = useLocation();
+  const { theme } = useThemeStore();
+  const isDark = theme === 'dark';
+
+  const bgPrimary = isDark ? '#151515' : '#f0f2f5';
+  const bgSecondary = isDark ? '#1e1e1e' : '#ffffff';
+
+  const menuItems = [
+    {
+      key: '/',
+      icon: <HomeOutlined />,
+      label: <Link to="/">首页</Link>,
+    },
+    {
+      key: '/games',
+      icon: <AppstoreOutlined />,
+      label: <Link to="/games">游戏列表</Link>,
+    },
+    {
+      key: '/search',
+      icon: <SearchOutlined />,
+      label: <Link to="/search">搜索</Link>,
+    },
+    {
+      key: '/profile',
+      icon: <UserOutlined />,
+      label: <Link to="/profile">个人中心</Link>,
+    },
+    { type: 'divider' },
+    {
+      key: 'new-releases',
+      icon: <FireOutlined />,
+      label: '新发售',
+      children: [
+        { key: '/games?ordering=-released', label: <Link to="/games?ordering=-released">最近30天</Link> },
+        { key: '/calendar', label: '发售日历' },
+      ],
+    },
+    {
+      key: 'top',
+      icon: <TrophyOutlined />,
+      label: '排行榜',
+      children: [
+        { key: '/games?ordering=-metacritic', label: <Link to="/games?ordering=-metacritic">评分最高</Link> },
+        { key: '/games?ordering=-added', label: <Link to="/games?ordering=-added">最受关注</Link> },
+        { key: '/top=250', label: <Link to="/games?top=250">Top 250</Link> },
+      ],
+    },
   ];
 
+  const menuTheme = isDark ? 'dark' : 'light';
+
   return (
-    <AntLayout className="min-h-screen">
+    <AntLayout className="min-h-screen" style={{ background: bgPrimary }}>
+      {/* Top Header */}
       <Header />
-      <Content className="p-4 md:p-8">
-        <div className="max-w-7xl mx-auto">
-          <Outlet />
-        </div>
-      </Content>
-      <Footer className="text-center bg-white">
-        <div className="text-gray-500">
-          游戏图鉴 Game Guide © 2026 - 专业端游游戏数据库
-        </div>
-      </Footer>
+
+      <AntLayout hasSider style={{ background: bgPrimary }}>
+        {/* Left Sidebar */}
+        <Sider
+          width={220}
+          className="sidebar hidden md:block"
+          style={{
+            background: bgSecondary,
+            position: 'fixed',
+            left: 0,
+            top: 64,
+            bottom: 0,
+            overflow: 'auto',
+            borderRight: isDark ? '1px solid #2a2a2a' : '1px solid #e8e8e8',
+          }}
+        >
+          <Menu
+            mode="inline"
+            theme={menuTheme}
+            selectedKeys={[location.pathname]}
+            items={menuItems}
+            style={{ background: 'transparent', borderRight: 0 }}
+          />
+        </Sider>
+
+        {/* Main Content */}
+        <AntLayout
+          style={{
+            marginLeft: 0,
+            transition: 'margin-left 0.2s',
+            background: bgPrimary,
+          }}
+          className="md:ml-[220px]"
+        >
+          <div
+            style={{
+              padding: '24px',
+              maxWidth: '1400px',
+              margin: '0 auto',
+            }}
+          >
+            <Outlet />
+          </div>
+        </AntLayout>
+      </AntLayout>
     </AntLayout>
   );
 };

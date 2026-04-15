@@ -1,11 +1,12 @@
 import React, { useEffect, useState } from 'react';
-import { useParams, Link } from 'react-router-dom';
+import { useParams } from 'react-router-dom';
 import { Card, Row, Col, Typography, Descriptions, Tag, Rate, Spin, Button, Image, Collapse, Space, message } from 'antd';
-import { EnvironmentOutlined, CalendarOutlined, StarOutlined, HeartOutlined, ShareAltOutlined } from '@ant-design/icons';
+import { EnvironmentOutlined, HeartOutlined, ShareAltOutlined } from '@ant-design/icons';
 import { getGameBySlug, getGameScreenshots } from '../services/rawgApi';
 import { addFavorite, removeFavorite, getFavorites } from '../services/api';
 import { translateToChinese } from '../services/translate';
 import useAuthStore from '../store/authStore';
+import useThemeStore from '../store/themeStore';
 
 const { Title, Paragraph } = Typography;
 const { Panel } = Collapse;
@@ -17,6 +18,11 @@ const GameDetail = () => {
   const [isFavorite, setIsFavorite] = useState(false);
   const [userRating, setUserRating] = useState(0);
   const { isAuthenticated } = useAuthStore();
+  const { theme } = useThemeStore();
+  const isDark = theme === 'dark';
+
+  const cardBg = isDark ? '#242424' : '#ffffff';
+  const textColor = isDark ? '#ffffff' : '#000000';
 
   useEffect(() => {
     fetchGameDetail();
@@ -47,7 +53,7 @@ const GameDetail = () => {
 
       if (isAuthenticated) {
         const favorites = await getFavorites();
-        setIsFavorite(favorites.data.some(f => f.gameId === gameData.gameId));
+        setIsFavorite(favorites.data.some(f => f.gameId === gameData.id.toString()));
       }
     } catch (error) {
       console.error('Failed to fetch game:', error);
@@ -63,11 +69,11 @@ const GameDetail = () => {
     }
     try {
       if (isFavorite) {
-        await removeFavorite(game.gameId);
+        await removeFavorite(game.id.toString());
         setIsFavorite(false);
         message.success('已取消收藏');
       } else {
-        await addFavorite(game.gameId, { name: game.name, background_image: game.backgroundImage });
+        await addFavorite(game.id.toString(), { name: game.name, background_image: game.background_image });
         setIsFavorite(true);
         message.success('已添加到收藏');
       }
@@ -101,11 +107,32 @@ const GameDetail = () => {
     <div className="space-y-6">
       {/* Hero Section */}
       <div
-        className="relative h-64 md:h-96 rounded-lg overflow-hidden bg-cover bg-center"
-        style={{ backgroundImage: `linear-gradient(transparent, rgba(0,0,0,0.7)), url(${game.backgroundImage})` }}
+        style={{
+          position: 'relative',
+          width: '100%',
+          overflow: 'hidden',
+        }}
       >
-        <div className="absolute bottom-0 left-0 p-6 md:p-10 text-white w-full">
-          <Title level={1} className="text-white mb-2">{game.name}</Title>
+        <img
+          src={game.background_image}
+          alt={game.name}
+          style={{
+            width: '100%',
+            height: 'auto',
+            display: 'block',
+          }}
+        />
+        <div
+          style={{
+            position: 'absolute',
+            inset: 0,
+            background: isDark
+              ? 'linear-gradient(transparent 30%, rgba(0,0,0,0.85))'
+              : 'linear-gradient(transparent 30%, rgba(255,255,255,0.9))',
+          }}
+        />
+        <div className="absolute bottom-0 left-0 p-6 md:p-10 w-full">
+          <Title level={1} style={{ color: isDark ? '#fff' : '#000', marginBottom: 8 }}>{game.name}</Title>
           <Space className="flex flex-wrap gap-2">
             {game.genres?.map(g => (
               <Tag key={`genre-${g.id}`} color="blue">{g.name}</Tag>
@@ -118,7 +145,7 @@ const GameDetail = () => {
       </div>
 
       {/* Action Buttons */}
-      <Card className="shadow-sm">
+      <Card className="shadow-sm" style={{ background: cardBg }}>
         <Space size="large">
           <Button
             type={isFavorite ? 'primary' : 'default'}
@@ -131,7 +158,7 @@ const GameDetail = () => {
         </Space>
 
         <div className="mt-4 flex items-center gap-4">
-          <span>游戏评分:</span>
+          <span style={{ color: textColor }}>游戏评分:</span>
           <Rate allowHalf defaultValue={game.metacritic ? game.metacritic / 20 : 0} disabled />
           {game.metacritic && (
             <Tag color={game.metacritic >= 75 ? 'green' : game.metacritic >= 50 ? 'orange' : 'red'}>
@@ -142,7 +169,7 @@ const GameDetail = () => {
 
         {isAuthenticated && (
           <div className="mt-4">
-            <span>我要评分: </span>
+            <span style={{ color: textColor }}>我要评分: </span>
             <Rate value={userRating} onChange={handleRating} allowHalf />
           </div>
         )}
@@ -151,15 +178,15 @@ const GameDetail = () => {
       {/* Game Info */}
       <Row gutter={24}>
         <Col xs={24} md={16}>
-          <Card title="游戏介绍" className="mb-6">
-            <Paragraph className="text-base leading-relaxed">
+          <Card title="游戏介绍" className="mb-6" style={{ background: cardBg }}>
+            <Paragraph style={{ color: textColor }} className="text-base leading-relaxed">
               {game.translatedDescription || game.description_raw || game.description || '暂无描述'}
             </Paragraph>
           </Card>
 
           {/* Screenshots */}
           {game.screenshots?.length > 0 && (
-            <Card title="截图" className="mb-6">
+            <Card title="截图" className="mb-6" style={{ background: cardBg }}>
               <Image.PreviewGroup>
                 <Space size={4} className="flex flex-wrap">
                   {game.screenshots.map((screenshot, index) => (
@@ -171,7 +198,7 @@ const GameDetail = () => {
           )}
 
           {/* Platforms */}
-          <Card title="支持的平台" className="mb-6">
+          <Card title="支持的平台" className="mb-6" style={{ background: cardBg }}>
             <Space>
               {game.platforms?.map(p => (
                 <Tag key={`platform-detail-${p.platform.id}`} color="blue">{p.platform.name}</Tag>
@@ -181,21 +208,21 @@ const GameDetail = () => {
         </Col>
 
         <Col xs={24} md={8}>
-          <Card title="游戏信息" className="mb-6">
+          <Card title="游戏信息" className="mb-6" style={{ background: cardBg }}>
             <Descriptions column={1} size="small">
-              <Descriptions.Item label="开发商">
+              <Descriptions.Item label="开发商" style={{ color: textColor }}>
                 {game.developers?.map(d => d.name).join(', ') || '未知'}
               </Descriptions.Item>
-              <Descriptions.Item label="发行商">
+              <Descriptions.Item label="发行商" style={{ color: textColor }}>
                 {game.publishers?.map(p => p.name).join(', ') || '未知'}
               </Descriptions.Item>
-              <Descriptions.Item label="发行日期">
+              <Descriptions.Item label="发行日期" style={{ color: textColor }}>
                 {game.released || '未知'}
               </Descriptions.Item>
-              <Descriptions.Item label="类型">
+              <Descriptions.Item label="类型" style={{ color: textColor }}>
                 {game.genres?.map(g => g.name).join(', ')}
               </Descriptions.Item>
-              <Descriptions.Item label="Metacritic评分">
+              <Descriptions.Item label="Metacritic评分" style={{ color: textColor }}>
                 {game.metacritic || '暂无'}
               </Descriptions.Item>
             </Descriptions>
@@ -203,7 +230,7 @@ const GameDetail = () => {
 
           {/* Tags */}
           {game.tags?.length > 0 && (
-            <Card title="标签" className="mb-6">
+            <Card title="标签" className="mb-6" style={{ background: cardBg }}>
               <Space wrap>
                 {game.tags.slice(0, 15).map((tag, i) => (
                   <Tag key={`tag-${tag.id || i}`}>{tag.name}</Tag>
@@ -214,14 +241,14 @@ const GameDetail = () => {
 
           {/* Requirements */}
           {game.requirements?.minimum && (
-            <Card title="系统要求" className="mb-6">
+            <Card title="系统要求" className="mb-6" style={{ background: cardBg }}>
               <Collapse defaultActiveKey={['minimum']}>
                 <Panel header="最低配置" key="minimum">
-                  <pre className="whitespace-pre-wrap text-sm">{game.requirements.minimum}</pre>
+                  <pre className="whitespace-pre-wrap text-sm" style={{ color: textColor }}>{game.requirements.minimum}</pre>
                 </Panel>
                 {game.requirements.recommended && (
                   <Panel header="推荐配置" key="recommended">
-                    <pre className="whitespace-pre-wrap text-sm">{game.requirements.recommended}</pre>
+                    <pre className="whitespace-pre-wrap text-sm" style={{ color: textColor }}>{game.requirements.recommended}</pre>
                   </Panel>
                 )}
               </Collapse>

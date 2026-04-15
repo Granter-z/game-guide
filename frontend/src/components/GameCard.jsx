@@ -1,29 +1,77 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { Card, Rate, Image } from 'antd';
-import { EnvironmentOutlined, CalendarOutlined } from '@ant-design/icons';
+import { Card } from 'antd';
+import { PlusOutlined, HeartOutlined } from '@ant-design/icons';
+import useThemeStore from '../store/themeStore';
 
-const GameCard = ({ game }) => {
+const GameCard = ({ game, onAddFavorite }) => {
+  const { theme } = useThemeStore();
+  const isDark = theme === 'dark';
   const fallbackImage = 'https://imgbed.cn/file/placeholder/400x225.png';
+
+  const cardBg = isDark ? '#242424' : '#ffffff';
+  const textColor = isDark ? '#ffffff' : '#000000';
+  const textSecondary = isDark ? '#888' : '#666666';
+  const textTertiary = isDark ? '#666' : '#999999';
+  const tagBg = isDark ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.08)';
+  const boxShadow = isDark ? '0 8px 24px rgba(0,0,0,0.4)' : '0 2px 8px rgba(0,0,0,0.1)';
 
   return (
     <Link to={`/games/${game.slug}`} className="block">
       <Card
         hoverable
-        className="game-card h-full overflow-hidden"
+        className="game-card"
+        style={{
+          background: cardBg,
+          borderRadius: 12,
+          overflow: 'hidden',
+          height: '100%',
+          boxShadow: isDark ? undefined : boxShadow,
+          border: isDark ? undefined : '1px solid #e8e8e8',
+        }}
         cover={
-          <div className="relative overflow-hidden aspect-video">
-            <Image
+          <div className="game-card-cover" style={{ position: 'relative', height: 180 }}>
+            <img
               src={game.background_image || fallbackImage}
               alt={game.name}
-              fallback={fallbackImage}
-              className="w-full h-full object-cover"
-              preview={false}
+              style={{
+                width: '100%',
+                height: '100%',
+                objectFit: 'cover',
+              }}
+              onError={(e) => {
+                e.target.src = fallbackImage;
+              }}
             />
+            {/* Plus Button */}
+            <div
+              className="game-card-plus"
+              onClick={(e) => {
+                e.preventDefault();
+                onAddFavorite && onAddFavorite(game);
+              }}
+            >
+              <PlusOutlined />
+            </div>
+            {/* Heart Icon */}
+            <div className="game-card-heart">
+              <HeartOutlined />
+            </div>
+            {/* Metacritic Score */}
             {game.metacritic && (
-              <div className={`absolute top-2 right-2 px-2 py-1 rounded text-white text-sm font-bold ${
-                game.metacritic >= 75 ? 'bg-green-500' : game.metacritic >= 50 ? 'bg-yellow-500' : 'bg-red-500'
-              }`}>
+              <div
+                style={{
+                  position: 'absolute',
+                  top: 8,
+                  left: 8,
+                  background: game.metacritic >= 75 ? '#4caf50' : game.metacritic >= 50 ? '#ff9800' : '#f44336',
+                  color: '#fff',
+                  padding: '2px 8px',
+                  borderRadius: 4,
+                  fontSize: 12,
+                  fontWeight: 600,
+                }}
+              >
                 {game.metacritic}
               </div>
             )}
@@ -31,28 +79,43 @@ const GameCard = ({ game }) => {
         }
       >
         <Card.Meta
-          title={<span className="font-semibold text-base">{game.name}</span>}
+          title={
+            <span
+              className="game-card-title"
+              style={{
+                color: textColor,
+                fontSize: 14,
+                fontWeight: 600,
+                overflow: 'hidden',
+                textOverflow: 'ellipsis',
+                whiteSpace: 'nowrap',
+              }}
+            >
+              {game.name}
+            </span>
+          }
           description={
-            <div className="space-y-1 mt-2">
-              <div className="flex flex-wrap gap-1">
-                {game.genres?.slice(0, 3).map((genre) => (
-                  <span key={genre.id} className="text-xs bg-primary/10 text-primary px-2 py-0.5 rounded">
+            <div className="game-card-meta" style={{ color: textSecondary, fontSize: 12, marginTop: 4 }}>
+              <div style={{ display: 'flex', flexWrap: 'wrap', gap: 4 }}>
+                {game.genres?.slice(0, 2).map((genre) => (
+                  <span
+                    key={genre.id}
+                    style={{
+                      background: tagBg,
+                      padding: '2px 6px',
+                      borderRadius: 4,
+                      fontSize: 11,
+                    }}
+                  >
                     {genre.name}
                   </span>
                 ))}
               </div>
-              <div className="flex items-center gap-3 text-xs text-gray-500">
-                {game.released && (
-                  <span className="flex items-center gap-1">
-                    <CalendarOutlined /> {game.released}
-                  </span>
-                )}
-                {game.platforms?.slice(0, 2).map((p) => (
-                  <span key={p.platform.id} className="flex items-center gap-1">
-                    <EnvironmentOutlined /> {p.platform.name}
-                  </span>
-                ))}
-              </div>
+              {game.released && (
+                <div style={{ marginTop: 4, color: textTertiary }}>
+                  {game.released}
+                </div>
+              )}
             </div>
           }
         />

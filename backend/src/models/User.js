@@ -27,8 +27,17 @@ const userSchema = new mongoose.Schema({
     default: ''
   },
   favorites: [{
-    type: mongoose.Schema.Types.ObjectId,
-    ref: 'Game'
+    gameId: String,
+    name: String,
+    slug: String,
+    background_image: String,
+    metacritic: Number,
+    genres: [{
+      id: Number,
+      name: String,
+      slug: String
+    }],
+    released: String
   }],
   ratings: [{
     gameId: String,

@@ -34,7 +34,8 @@ const Home = () => {
       try {
         setLoading(true);
         setPage(1);
-        const res = await getGames({ page: 1, page_size: 20, ordering });
+        // PC (端游) = 1, PS4 = 18, PS5 = 187
+        const res = await getGames({ page: 1, page_size: 20, ordering, platforms: '1,18,187' });
         setGames(res.data.results || []);
         setHasMore(res.data.results?.length === 20);
       } catch (error) {
@@ -53,7 +54,7 @@ const Home = () => {
     try {
       setLoadingMore(true);
       const nextPage = page + 1;
-      const res = await getGames({ page: nextPage, page_size: 20, ordering });
+      const res = await getGames({ page: nextPage, page_size: 20, ordering, platforms: '1,18,187' });
       const newGames = res.data.results || [];
 
       if (newGames.length === 0) {

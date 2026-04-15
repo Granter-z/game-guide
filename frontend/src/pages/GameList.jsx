@@ -44,7 +44,8 @@ const GameList = () => {
   const fetchGames = async () => {
     try {
       setLoading(true);
-      const params = { page, page_size: pagination.pageSize, ...filters };
+      // PC (端游) = 1, PS4 = 18, PS5 = 187
+      const params = { page, page_size: pagination.pageSize, platforms: '1,18,187', ...filters };
       Object.keys(params).forEach(key => params[key] === null && delete params[key]);
 
       const res = await getGames(params);

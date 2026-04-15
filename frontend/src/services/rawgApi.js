@@ -1,14 +1,12 @@
 import axios from 'axios';
 
 const RAWG_API_KEY = 'e59ef34a1dc24a11a368041c077f9eb8';
-const RAWG_BASE_URL = 'https://api.rawg.io/api';
+const RAWG_BASE_URL = import.meta.env.VITE_RAWG_PROXY_URL || 'https://api.rawg.io/api';
 
 const rawgApi = axios.create({
   baseURL: RAWG_BASE_URL,
-  timeout: 15000,
-  params: {
-    key: RAWG_API_KEY
-  }
+  timeout: 20000,
+  params: RAWG_BASE_URL.includes('api.rawg.io') ? { key: RAWG_API_KEY } : {}
 });
 
 export const getGames = (params) => rawgApi.get('/games', { params });

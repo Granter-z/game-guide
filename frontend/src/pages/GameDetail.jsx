@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import { Card, Row, Col, Typography, Descriptions, Tag, Rate, Spin, Button, Image, Collapse, Space, message } from 'antd';
 import { EnvironmentOutlined, HeartOutlined, ShareAltOutlined } from '@ant-design/icons';
-import { getGameBySlug, getGameScreenshots } from '../services/rawgApi';
+import { getGameBySlug } from '../services/rawgApi';
 import { addFavorite, removeFavorite, getFavorites } from '../services/api';
 import { translateToChinese } from '../services/translate';
 import useAuthStore from '../store/authStore';
@@ -34,9 +34,8 @@ const GameDetail = () => {
       const res = await getGameBySlug(slug);
       const gameData = res.data;
 
-      // 获取截图
-      const screenshotsRes = await getGameScreenshots(gameData.id);
-      gameData.screenshots = screenshotsRes.data?.results?.map(s => s.image) || [];
+      // 后端已经返回截图，不需要单独请求
+      // gameData.screenshots 已经在后端返回
 
       // 自动翻译描述
       try {

@@ -1,23 +1,24 @@
 import axios from 'axios';
 
-const RAWG_API_KEY = 'e59ef34a1dc24a11a368041c077f9eb8';
-const RAWG_BASE_URL = 'https://api.rawg.io/api';
+// 使用后端代理 API，隐藏 RAWG API Key
+const API_BASE_URL = 'http://localhost:4000/api';
 
-const rawgApi = axios.create({
-  baseURL: RAWG_BASE_URL,
+const apiClient = axios.create({
+  baseURL: API_BASE_URL,
   timeout: 15000,
-  params: {
-    key: RAWG_API_KEY
-  }
 });
 
-export const getGames = (params) => rawgApi.get('/games', { params });
-export const getGameBySlug = (slug) => rawgApi.get(`/games/${slug}`);
-export const searchGames = (query, page, platforms) => rawgApi.get('/games', { params: { search: query, page, platforms } });
-export const getGenres = () => rawgApi.get('/genres');
-export const getPlatforms = () => rawgApi.get('/platforms');
-export const getGameDetails = (id) => rawgApi.get(`/games/${id}`);
-export const getGameScreenshots = (id) => rawgApi.get(`/games/${id}/screenshots`);
-export const getGameTrailers = (id) => rawgApi.get(`/games/${id}/movies`);
+export const getGames = (params) => apiClient.get('/games', { params });
+export const getGameBySlug = (slug) => apiClient.get(`/games/${slug}`);
+export const searchGames = (query, page) => apiClient.get('/games/search', { params: { q: query, page } });
+export const getGenres = () => apiClient.get('/games/genres');
+export const getPlatforms = () => apiClient.get('/games/platforms');
+export const getGameDetails = async (id) => {
+  // 游戏详情通过 slug 获取，返回完整数据包括 screenshots
+  const res = await apiClient.get(`/games/${id}`);
+  return res.data;
+};
+export const getGameScreenshots = (id) => apiClient.get(`/games/${id}/screenshots`).catch(() => ({ data: { results: [] } }));
+export const getGameTrailers = (id) => apiClient.get(`/games/${id}/trailers`).catch(() => ({ data: { results: [] } }));
 
-export default rawgApi;
+export default apiClient;

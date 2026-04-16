@@ -1,16 +1,18 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, Suspense, lazy } from 'react';
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
-import { ConfigProvider, theme as antdTheme } from 'antd';
+import { ConfigProvider, theme as antdTheme, Spin } from 'antd';
 import zhCN from 'antd/locale/zh_CN';
 import Layout from './components/Layout';
 import Home from './pages/Home';
 import GameList from './pages/GameList';
-import GameDetail from './pages/GameDetail';
-import Search from './pages/Search';
-import Login from './pages/Login';
-import Profile from './pages/Profile';
-import Chat from './pages/Chat';
 import useThemeStore from './store/themeStore';
+
+// 懒加载页面组件
+const GameDetail = lazy(() => import('./pages/GameDetail'));
+const Search = lazy(() => import('./pages/Search'));
+const Login = lazy(() => import('./pages/Login'));
+const Profile = lazy(() => import('./pages/Profile'));
+const Chat = lazy(() => import('./pages/Chat'));
 
 const App = () => {
   const { theme } = useThemeStore();
@@ -123,17 +125,19 @@ const App = () => {
   return (
     <ConfigProvider theme={antdThemeConfig} locale={zhCN}>
       <BrowserRouter>
-        <Routes>
-          <Route path="/" element={<Layout />}>
-            <Route index element={<Home />} />
-            <Route path="games" element={<GameList />} />
-            <Route path="games/:slug" element={<GameDetail />} />
-            <Route path="search" element={<Search />} />
-            <Route path="login" element={<Login />} />
-            <Route path="profile" element={<Profile />} />
-            <Route path="chat" element={<Chat />} />
-          </Route>
-        </Routes>
+        <Suspense fallback={<div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh' }}><Spin size="large" /></div>}>
+          <Routes>
+            <Route path="/" element={<Layout />}>
+              <Route index element={<Home />} />
+              <Route path="games" element={<GameList />} />
+              <Route path="games/:slug" element={<GameDetail />} />
+              <Route path="search" element={<Search />} />
+              <Route path="login" element={<Login />} />
+              <Route path="profile" element={<Profile />} />
+              <Route path="chat" element={<Chat />} />
+            </Route>
+          </Routes>
+        </Suspense>
       </BrowserRouter>
     </ConfigProvider>
   );

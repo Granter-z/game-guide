@@ -62,8 +62,8 @@ const Header = () => {
       {/* Logo */}
       <Link to="/" style={{ textDecoration: 'none' }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-          <span style={{ fontSize: 22, fontWeight: 700, color: textColor }}>RAWG</span>
-          <span style={{ fontSize: 12, color: textSecondary, marginLeft: 4 }}>游戏图鉴</span>
+          <span style={{ fontSize: 22, fontWeight: 700, color: textColor }}>Granter</span>
+          <span style={{ fontSize: 12, color: textSecondary, marginLeft: 4 }}>Granter游戏图鉴</span>
         </div>
       </Link>
 

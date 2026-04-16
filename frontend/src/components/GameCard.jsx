@@ -7,7 +7,7 @@ import useThemeStore from '../store/themeStore';
 const GameCard = ({ game, onAddFavorite }) => {
   const { theme } = useThemeStore();
   const isDark = theme === 'dark';
-  const fallbackImage = 'https://imgbed.cn/file/placeholder/400x225.png';
+  const fallbackImage = 'https://placehold.co/400x225/242424/666?text=No+Image';
 
   const cardBg = isDark ? '#242424' : '#ffffff';
   const textColor = isDark ? '#ffffff' : '#000000';
@@ -34,6 +34,7 @@ const GameCard = ({ game, onAddFavorite }) => {
             <img
               src={game.background_image || fallbackImage}
               alt={game.name}
+              loading="lazy"
               style={{
                 width: '100%',
                 height: '100%',

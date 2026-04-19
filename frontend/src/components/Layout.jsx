@@ -169,9 +169,9 @@ const Layout = () => {
 
         {/* Main Content */}
         <AntLayout
+          className="lg:!ml-[220px]"
           style={{
             background: bgPrimary,
-            marginLeft: 220,
           }}
         >
           <div

@@ -1,6 +1,6 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { Outlet, Link, useLocation } from 'react-router-dom';
-import { Layout as AntLayout, Menu } from 'antd';
+import { Layout as AntLayout, Menu, Drawer } from 'antd';
 import {
   HomeOutlined,
   AppstoreOutlined,
@@ -12,6 +12,7 @@ import {
 } from '@ant-design/icons';
 import Header from './Header';
 import useThemeStore from '../store/themeStore';
+import useUiStore from '../store/uiStore';
 
 const { Sider } = AntLayout;
 
@@ -19,6 +20,8 @@ const Layout = () => {
   const location = useLocation();
   const { theme } = useThemeStore();
   const isDark = theme === 'dark';
+  const mobileNavOpen = useUiStore((s) => s.mobileNavOpen);
+  const setMobileNavOpen = useUiStore((s) => s.setMobileNavOpen);
 
   const bgPrimary = isDark ? '#151515' : '#f0f2f5';
   const bgSecondary = isDark ? '#1e1e1e' : '#ffffff';
@@ -98,8 +101,12 @@ const Layout = () => {
 
   const menuTheme = isDark ? 'dark' : 'light';
 
+  useEffect(() => {
+    setMobileNavOpen(false);
+  }, [location.pathname, location.search, setMobileNavOpen]);
+
   return (
-    <AntLayout className="min-h-screen" style={{ background: bgPrimary }}>
+    <AntLayout className="min-h-screen overflow-x-hidden" style={{ background: bgPrimary }}>
       {/* Top Header */}
       <Header />
 
@@ -134,17 +141,31 @@ const Layout = () => {
             background: bgPrimary,
           }}
         >
-          <div
-            style={{
-              padding: '24px',
-              paddingLeft: '244px',
-              minHeight: 'calc(100vh - 64px)',
-            }}
-          >
+          <div className="min-h-[calc(100vh-64px)] px-3 py-4 sm:px-5 sm:py-5 md:pl-[244px] md:pr-6 md:py-6">
             <Outlet />
           </div>
         </AntLayout>
       </AntLayout>
+
+      <Drawer
+        title="导航"
+        placement="left"
+        width={280}
+        open={mobileNavOpen}
+        onClose={() => setMobileNavOpen(false)}
+        styles={{ body: { padding: 0 } }}
+        className="md:hidden"
+      >
+        <Menu
+          mode="inline"
+          theme={menuTheme}
+          selectedKeys={[pathnameWithSearch]}
+          defaultOpenKeys={['new-releases', 'top']}
+          items={menuItems}
+          style={{ background: 'transparent', borderRight: 0 }}
+          onClick={() => setMobileNavOpen(false)}
+        />
+      </Drawer>
     </AntLayout>
   );
 };

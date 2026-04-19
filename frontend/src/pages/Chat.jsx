@@ -32,19 +32,24 @@ const Chat = () => {
   };
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', height: 'calc(100vh - 180px)' }}>
+    <div
+      className="flex flex-col min-h-0"
+      style={{ height: 'min(calc(100vh - 140px), calc(100dvh - 140px))' }}
+    >
       {/* 头部 */}
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
-        <div>
-          <Title level={2} style={{ color: textColor, margin: 0 }}>
+      <div className="flex flex-col gap-3 sm:flex-row sm:justify-between sm:items-center mb-4">
+        <div className="min-w-0">
+          <Title level={2} className="!text-xl sm:!text-2xl !mb-1" style={{ color: textColor, margin: 0 }}>
             <RobotOutlined style={{ marginRight: 8 }} />
             AI 游戏推荐
           </Title>
-          <Text style={{ color: textSecondary }}>
+          <Text className="text-sm sm:text-base" style={{ color: textSecondary }}>
             告诉我你喜欢什么类型的游戏，AI会为你推荐
           </Text>
         </div>
-        <Button icon={<PlusOutlined />} onClick={createSession}>新对话</Button>
+        <Button icon={<PlusOutlined />} onClick={createSession} className="self-start sm:self-auto shrink-0">
+          新对话
+        </Button>
       </div>
 
       {/* 消息列表 */}
@@ -65,7 +70,7 @@ const Chat = () => {
             dataSource={messages}
             renderItem={(msg) => (
               <List.Item style={{ justifyContent: msg.role === 'user' ? 'flex-end' : 'flex-start', border: 'none', padding: '8px 0' }}>
-                <div style={{ maxWidth: '70%' }}>
+                <div className="max-w-[min(88vw,560px)] sm:max-w-[70%]">
                   <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 4 }}>
                     {msg.role === 'assistant' ? <Avatar icon={<RobotOutlined />} size="small" style={{ background: '#ff4757' }} /> : null}
                     <Text strong style={{ color: textSecondary, fontSize: 12 }}>

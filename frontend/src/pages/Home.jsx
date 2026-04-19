@@ -99,9 +99,9 @@ const Home = () => {
   return (
     <div>
       {/* Header */}
-      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 24 }}>
-        <div>
-          <h1 style={{ color: textColor, fontSize: 28, fontWeight: 700, margin: 0 }}>
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between mb-6">
+        <div className="min-w-0">
+          <h1 className="text-2xl sm:text-[28px] font-bold m-0" style={{ color: textColor }}>
             新潮与趋势
           </h1>
           <p style={{ color: textSecondary, fontSize: 13, margin: '8px 0 0 0' }}>
@@ -112,7 +112,7 @@ const Home = () => {
           value={ordering}
           onChange={setOrdering}
           options={ORDERINGS}
-          style={{ width: 140 }}
+          className="w-full max-w-[200px] sm:w-[140px]"
         />
       </div>
 

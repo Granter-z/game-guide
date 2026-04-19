@@ -110,11 +110,12 @@ const Home = () => {
       <div 
         style={{ 
           display: 'flex', 
-          flexDirection: 'column',
-          gap: 8,
+          flexDirection: 'row',
+          alignItems: 'center',
+          justifyContent: 'space-between',
+          gap: 16,
           marginBottom: 16 
         }}
-        className="sm:flex-row sm:items-center sm:justify-between"
       >
         <div>
           <h1 style={{ color: textColor, fontSize: 22, fontWeight: 700, margin: 0 }}>

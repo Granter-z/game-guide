@@ -1,8 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { useSearchParams } from 'react-router-dom';
-import { Row, Col, Pagination, Spin, Empty, Select, Button } from 'antd';
+import { Row, Col, Pagination, Spin, Empty, Select, Button, Alert } from 'antd';
 import { AppstoreOutlined, UnorderedListOutlined } from '@ant-design/icons';
 import { getGames } from '../services/rawgApi';
+import { describeApiError } from '../services/api';
 import GameCard from '../components/GameCard';
 import GameFilter from '../components/GameFilter';
 import useThemeStore from '../store/themeStore';
@@ -11,6 +12,7 @@ const GameList = () => {
   const [searchParams, setSearchParams] = useSearchParams();
   const [games, setGames] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [loadError, setLoadError] = useState(null);
   const [viewMode, setViewMode] = useState('grid');
   const [pagination, setPagination] = useState({
     count: 0,
@@ -57,8 +59,11 @@ const GameList = () => {
         next: res.data.next,
         previous: res.data.previous
       }));
+      setLoadError(null);
     } catch (error) {
       console.error('Failed to fetch games:', error);
+      setGames([]);
+      setLoadError(describeApiError(error));
     } finally {
       setLoading(false);
     }
@@ -102,6 +107,9 @@ const GameList = () => {
 
   return (
     <div>
+      {loadError && (
+        <Alert type="error" showIcon message="游戏列表加载失败" description={loadError} style={{ marginBottom: 16 }} />
+      )}
       {/* Page Header */}
       <div
         style={{
@@ -177,7 +185,9 @@ const GameList = () => {
         </div>
       ) : games.length === 0 ? (
         <Empty
-          description={<span style={{ color: textSecondary }}>暂无游戏数据</span>}
+          description={
+            <span style={{ color: textSecondary }}>{loadError ? '无法加载，请查看上方说明' : '暂无游戏数据'}</span>
+          }
           style={{ padding: 60 }}
         />
       ) : (

@@ -1,6 +1,7 @@
 import React, { useEffect, useState, useRef, useCallback } from 'react';
-import { Row, Col, Spin, Select } from 'antd';
+import { Row, Col, Spin, Select, Alert } from 'antd';
 import { getGames } from '../services/rawgApi';
+import { describeApiError } from '../services/api';
 import GameCard from '../components/GameCard';
 import useThemeStore from '../store/themeStore';
 
@@ -22,6 +23,7 @@ const Home = () => {
   const [page, setPage] = useState(1);
   const [hasMore, setHasMore] = useState(true);
   const [ordering, setOrdering] = useState('-metacritic');
+  const [loadError, setLoadError] = useState(null);
 
   const observerRef = useRef();
   const lastGameRef = useRef(null);
@@ -39,8 +41,11 @@ const Home = () => {
         const res = await getGames({ page: 1, page_size: 20, ordering, platforms: '1,18,187' });
         setGames(res.data.results || []);
         setHasMore(res.data.results?.length === 20);
+        setLoadError(null);
       } catch (error) {
         console.error('Failed to fetch games:', error);
+        setGames([]);
+        setLoadError(describeApiError(error));
       } finally {
         setLoading(false);
       }
@@ -98,6 +103,9 @@ const Home = () => {
 
   return (
     <div>
+      {loadError && (
+        <Alert type="error" showIcon message="游戏列表加载失败" description={loadError} style={{ marginBottom: 16 }} />
+      )}
       {/* Header */}
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 24 }}>
         <div>

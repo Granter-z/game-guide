@@ -10,7 +10,6 @@ const gameSchema = new mongoose.Schema({
     type: String,
     required: true
   },
-  official_name_zh: String,
   slug: String,
   description: String,
   backgroundImage: String,
@@ -41,20 +40,6 @@ const gameSchema = new mongoose.Schema({
     id: Number,
     name: String
   }],
-  website: String,
-  reddit_url: String,
-  stores: [{
-    id: Number,
-    url: String,
-    store: {
-      id: Number,
-      name: String,
-      slug: String,
-      domain: String,
-      games_count: Number,
-      image_background: String
-    }
-  }],
   screenshots: [String],
   trailers: [{
     id: Number,
@@ -71,16 +56,6 @@ const gameSchema = new mongoose.Schema({
   ratings: {
     average: { type: Number, default: 0 },
     count: { type: Number, default: 0 }
-  },
-  enhancedContent: {
-    schemaVersion: { type: Number, default: 1 },
-    highlights: [String],
-    beginnerTips: [String],
-    advancedTips: [String],
-    faq: [{
-      q: String,
-      a: String
-    }]
   }
 }, {
   timestamps: true

@@ -77,16 +77,16 @@ const Profile = () => {
   const userInfo = user || {};
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: 24 }}>
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
       {/* User Info Card */}
       <Card>
-        <div style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
-          <Avatar size={64} icon={<UserOutlined />} style={{ background: '#ff4757' }} />
-          <div>
-            <h2 style={{ color: textColor, fontSize: 20, fontWeight: 'bold', margin: '0 0 4px 0' }}>{userInfo.username || 'User'}</h2>
-            <p style={{ color: textSecondary, margin: '0 0 8px 0' }}>{userInfo.email || ''}</p>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 12 }} className="flex-col sm:flex-row">
+          <Avatar size={48} icon={<UserOutlined />} style={{ background: '#ff4757' }} className="sm:size-[64px]" />
+          <div className="flex-1 w-full">
+            <h2 style={{ color: textColor, fontSize: 18, fontWeight: 'bold', margin: '0 0 4px 0' }}>{userInfo.username || 'User'}</h2>
+            <p style={{ color: textSecondary, margin: '0 0 8px 0', fontSize: 13 }}>{userInfo.email || ''}</p>
             <Button size="small" danger icon={<LogoutOutlined />} onClick={logout}>
-              退出登录
+              退出
             </Button>
           </div>
         </div>
@@ -101,13 +101,13 @@ const Profile = () => {
             {
               key: 'favorites',
               label: (
-                <span style={{ color: activeTab === 'favorites' ? textColor : textSecondary }}><HeartOutlined /> 我的收藏 ({favorites.length})</span>
+                <span style={{ color: activeTab === 'favorites' ? textColor : textSecondary, fontSize: 13 }}><HeartOutlined /> 收藏 ({favorites.length})</span>
               ),
               children: (
                 favorites.length === 0 ? (
                   <Empty description="暂无收藏" />
                 ) : (
-                  <Row gutter={[16, 16]}>
+                  <Row gutter={[12, 12]}>
                     {favorites.filter(Boolean).map((game) => game && game.gameId ? (
                       <Col key={game.gameId} xs={12} sm={8} md={6} lg={4}>
                         <div style={{ position: 'relative' }}>
@@ -139,21 +139,21 @@ const Profile = () => {
             {
               key: 'ratings',
               label: (
-                <span style={{ color: activeTab === 'ratings' ? textColor : textSecondary }}><StarOutlined /> 我的评分 ({ratings.length})</span>
+                <span style={{ color: activeTab === 'ratings' ? textColor : textSecondary, fontSize: 13 }}><StarOutlined /> 评分 ({ratings.length})</span>
               ),
               children: (
                 ratings.length === 0 ? (
                   <Empty description="暂无评分" />
                 ) : (
-                  <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
                     {ratings.map((rating, index) => (
                       <Card key={index} size="small">
-                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
-                          <div>
+                        <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+                          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: 8 }}>
                             <h4 style={{ color: textColor, fontWeight: 600, margin: 0 }}>{rating.gameId}</h4>
-                            <p style={{ color: textSecondary, fontSize: 14, margin: '4px 0 0 0' }}>{rating.comment || '无评论'}</p>
+                            <Rate disabled value={rating.score} style={{ fontSize: 12 }} />
                           </div>
-                          <Rate disabled value={rating.score} />
+                          <p style={{ color: textSecondary, fontSize: 13, margin: 0 }}>{rating.comment || '无评论'}</p>
                         </div>
                       </Card>
                     ))}

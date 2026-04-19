@@ -32,7 +32,7 @@ const GameCard = ({ game, onAddFavorite }) => {
           border: isDark ? undefined : '1px solid #e8e8e8',
         }}
         cover={
-          <div className="game-card-cover" style={{ position: 'relative', height: 180 }}>
+          <div className="game-card-cover" style={{ position: 'relative', height: 140 }}>
             <img
               src={game.background_image || fallbackImage}
               alt={displayName}

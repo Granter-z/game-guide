@@ -6,8 +6,6 @@ import {
   UserOutlined,
   LogoutOutlined,
   HeartOutlined,
-  BellOutlined,
-  PlusOutlined,
   MenuOutlined,
   BulbOutlined
 } from '@ant-design/icons';
@@ -16,7 +14,7 @@ import useThemeStore from '../store/themeStore';
 
 const { Header: AntHeader } = Layout;
 
-const Header = () => {
+const Header = ({ onMenuClick }) => {
   const navigate = useNavigate();
   const [searchText, setSearchText] = useState('');
   const [searchFocused, setSearchFocused] = useState(false);
@@ -55,15 +53,15 @@ const Header = () => {
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'space-between',
-        padding: '0 24px',
+        padding: '0 12px',
         height: 64,
       }}
     >
       {/* Logo */}
-      <Link to="/" style={{ textDecoration: 'none' }}>
+      <Link to="/" style={{ textDecoration: 'none' }} className="flex-shrink-0">
         <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-          <span style={{ fontSize: 22, fontWeight: 700, color: textColor }}>Granter</span>
-          <span style={{ fontSize: 12, color: textSecondary, marginLeft: 4 }}>Granter游戏图鉴</span>
+          <span style={{ fontSize: 20, fontWeight: 700, color: textColor }}>Granter</span>
+          <span style={{ fontSize: 11, color: textSecondary, marginLeft: 4 }} className="hidden sm:inline">游戏图鉴</span>
         </div>
       </Link>
 
@@ -72,9 +70,10 @@ const Header = () => {
         style={{
           flex: 1,
           maxWidth: 500,
-          margin: '0 40px',
+          margin: '0 12px',
           position: 'relative',
         }}
+        className="hidden sm:block"
       >
         <Input
           placeholder="搜索游戏..."
@@ -88,9 +87,9 @@ const Header = () => {
             background: bgSecondary,
             border: `1px solid ${borderColor}`,
             borderRadius: 24,
-            height: 44,
-            paddingLeft: 20,
-            paddingRight: 44,
+            height: 40,
+            paddingLeft: 18,
+            paddingRight: 40,
             transition: 'all 0.3s ease',
             boxShadow: searchFocused
               ? isDark
@@ -109,8 +108,8 @@ const Header = () => {
             right: 4,
             top: '50%',
             transform: 'translateY(-50%)',
-            height: 36,
-            width: 36,
+            height: 32,
+            width: 32,
             borderRadius: '50%',
             background: '#ff4757',
             border: 'none',
@@ -123,10 +122,18 @@ const Header = () => {
         />
       </div>
 
+      {/* Mobile Search Icon */}
+      <Button
+        type="text"
+        icon={<SearchOutlined style={{ color: textColor, fontSize: 18 }} />}
+        className="sm:hidden flex-shrink-0"
+        onClick={() => navigate('/search')}
+      />
+
       {/* Right Controls */}
-      <div style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
+      <div style={{ display: 'flex', alignItems: 'center', gap: 8 }} className="flex-shrink-0">
         {/* Theme Toggle */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 6 }} className="hidden md:flex">
           <BulbOutlined style={{ color: isDark ? '#888' : '#ffa500', fontSize: 16 }} />
           <Switch
             checked={isDark}
@@ -137,22 +144,16 @@ const Header = () => {
           />
         </div>
 
-        {/* Add Button */}
+        {/* Mobile Menu Button */}
         <Button
           type="text"
-          icon={<PlusOutlined style={{ color: textColor }} />}
+          icon={<MenuOutlined style={{ color: textColor, fontSize: 18 }} />}
+          className="lg:hidden"
+          onClick={onMenuClick}
         />
 
-        {/* Notifications */}
-        <Badge count={1} size="small">
-          <Button
-            type="text"
-            icon={<BellOutlined style={{ color: textColor, fontSize: 18 }} />}
-          />
-        </Badge>
-
-        {/* User Menu */}
-        <Dropdown menu={{ items: userMenuItems }} placement="bottomRight">
+        {/* Desktop User Menu */}
+        <Dropdown menu={{ items: userMenuItems }} placement="bottomRight" className="hidden md:block">
           <Button
             type="text"
             style={{
@@ -174,12 +175,12 @@ const Header = () => {
           </Button>
         </Dropdown>
 
-        {/* Mobile Menu */}
+        {/* Mobile User Icon */}
         <Button
           type="text"
-          icon={<MenuOutlined style={{ color: textColor }} />}
+          icon={<UserOutlined style={{ color: textColor, fontSize: 18 }} />}
           className="md:hidden"
-          onClick={() => navigate('/games')}
+          onClick={() => isAuthenticated ? navigate('/profile') : navigate('/login')}
         />
       </div>
     </AntHeader>

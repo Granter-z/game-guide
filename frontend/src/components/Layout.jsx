@@ -1,6 +1,6 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Outlet, Link, useLocation } from 'react-router-dom';
-import { Layout as AntLayout, Menu } from 'antd';
+import { Layout as AntLayout, Menu, Drawer, Button } from 'antd';
 import {
   HomeOutlined,
   AppstoreOutlined,
@@ -9,6 +9,8 @@ import {
   FireOutlined,
   TrophyOutlined,
   RobotOutlined,
+  MenuOutlined,
+  CloseOutlined,
 } from '@ant-design/icons';
 import Header from './Header';
 import useThemeStore from '../store/themeStore';
@@ -19,9 +21,11 @@ const Layout = () => {
   const location = useLocation();
   const { theme } = useThemeStore();
   const isDark = theme === 'dark';
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   const bgPrimary = isDark ? '#151515' : '#f0f2f5';
   const bgSecondary = isDark ? '#1e1e1e' : '#ffffff';
+  const textColor = isDark ? '#ffffff' : '#000000';
   const today = new Date();
 
   const toDateString = (date) => date.toISOString().slice(0, 10);
@@ -98,16 +102,38 @@ const Layout = () => {
 
   const menuTheme = isDark ? 'dark' : 'light';
 
+  const renderMobileMenu = () => (
+    <div className="p-4">
+      <div className="flex justify-between items-center mb-4">
+        <span className="text-lg font-semibold" style={{ color: textColor }}>菜单</span>
+        <Button
+          type="text"
+          icon={<CloseOutlined />}
+          onClick={() => setMobileMenuOpen(false)}
+        />
+      </div>
+      <Menu
+        mode="inline"
+        theme={menuTheme}
+        selectedKeys={[pathnameWithSearch]}
+        defaultOpenKeys={['new-releases', 'top']}
+        items={menuItems}
+        style={{ background: 'transparent', borderRight: 0 }}
+        onClick={() => setMobileMenuOpen(false)}
+      />
+    </div>
+  );
+
   return (
     <AntLayout className="min-h-screen" style={{ background: bgPrimary }}>
       {/* Top Header */}
-      <Header />
+      <Header onMenuClick={() => setMobileMenuOpen(true)} />
 
       <AntLayout hasSider style={{ background: bgPrimary }}>
-        {/* Left Sidebar */}
+        {/* Desktop Sidebar */}
         <Sider
           width={220}
-          className="sidebar hidden md:block"
+          className="sidebar hidden lg:block"
           style={{
             background: bgSecondary,
             position: 'fixed',
@@ -128,6 +154,19 @@ const Layout = () => {
           />
         </Sider>
 
+        {/* Mobile Drawer Menu */}
+        <Drawer
+          title={null}
+          placement="left"
+          closable={false}
+          onClose={() => setMobileMenuOpen(false)}
+          open={mobileMenuOpen}
+          width={280}
+          styles={{ body: { padding: 0, background: bgSecondary } }}
+        >
+          {renderMobileMenu()}
+        </Drawer>
+
         {/* Main Content */}
         <AntLayout
           style={{
@@ -136,10 +175,11 @@ const Layout = () => {
         >
           <div
             style={{
-              padding: '24px',
-              paddingLeft: '244px',
+              padding: '16px',
+              paddingLeft: 'clamp(16px, 4vw, 244px)',
               minHeight: 'calc(100vh - 64px)',
             }}
+            className="w-full overflow-x-hidden"
           >
             <Outlet />
           </div>

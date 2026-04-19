@@ -128,7 +128,7 @@ const GameDetail = () => {
   }
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-4">
       {/* Hero Section */}
       <div
         style={{
@@ -155,14 +155,14 @@ const GameDetail = () => {
               : 'linear-gradient(transparent 30%, rgba(255,255,255,0.9))',
           }}
         />
-        <div className="absolute bottom-0 left-0 p-6 md:p-10 w-full">
-          <Title level={1} style={{ color: isDark ? '#fff' : '#000', marginBottom: 8 }}>{displayName}</Title>
-          <Space className="flex flex-wrap gap-2">
+        <div style={{ position: 'absolute', bottom: 0, left: 0, padding: '12px', width: '100%' }} className="md:p-8 md:p-10">
+          <Title level={2} style={{ color: isDark ? '#fff' : '#000', marginBottom: 8 }}>{displayName}</Title>
+          <Space className="flex flex-wrap gap-2" size={[4, 4]}>
             {game.genres?.map(g => (
-              <Tag key={`genre-${g.id}`} color="blue">{g.name}</Tag>
+              <Tag key={`genre-${g.id}`} style={{ fontSize: 11 }}>{g.name}</Tag>
             ))}
-            {game.platforms?.map(p => (
-              <Tag key={`platform-${p.platform.id}`} icon={<EnvironmentOutlined />}>{p.platform.name}</Tag>
+            {game.platforms?.slice(0, 3).map(p => (
+              <Tag key={`platform-${p.platform.id}`} style={{ fontSize: 11 }}>{p.platform.name}</Tag>
             ))}
           </Space>
         </div>
@@ -170,29 +170,30 @@ const GameDetail = () => {
 
       {/* Action Buttons */}
       <Card className="shadow-sm" style={{ background: cardBg }}>
-        <Space size="large">
+        <div className="flex flex-wrap gap-3">
           <Button
             type={isFavorite ? 'primary' : 'default'}
             icon={<HeartOutlined />}
             onClick={handleToggleFavorite}
+            size="middle"
           >
-            {isFavorite ? '已收藏' : '添加收藏'}
+            {isFavorite ? '已收藏' : '收藏'}
           </Button>
-          <Button icon={<ShareAltOutlined />}>分享</Button>
-        </Space>
+          <Button icon={<ShareAltOutlined />} size="middle">分享</Button>
+        </div>
 
-        <div className="mt-4 flex items-center gap-4">
+        <div style={{ marginTop: 12, display: 'flex', flexWrap: 'wrap', alignItems: 'center', gap: 8 }}>
           <span style={{ color: textColor }}>游戏评分:</span>
-          <Rate allowHalf defaultValue={game.metacritic ? game.metacritic / 20 : 0} disabled />
+          <Rate allowHalf defaultValue={game.metacritic ? game.metacritic / 20 : 0} disabled style={{ fontSize: 14 }} />
           {game.metacritic && (
             <Tag color={game.metacritic >= 75 ? 'green' : game.metacritic >= 50 ? 'orange' : 'red'}>
-              Metacritic: {game.metacritic}
+              {game.metacritic}
             </Tag>
           )}
         </div>
 
         {isAuthenticated && (
-          <div className="mt-4">
+          <div style={{ marginTop: 12 }}>
             <span style={{ color: textColor }}>我要评分: </span>
             <Rate value={userRating} onChange={handleRating} allowHalf />
           </div>
@@ -200,17 +201,15 @@ const GameDetail = () => {
       </Card>
 
       {/* Game Info */}
-      <Row gutter={24}>
-        <Col xs={24} md={16}>
-          <Card title="游戏介绍" className="mb-6" style={{ background: cardBg }}>
-            <Space className="mb-3">
-              <Button loading={isTranslating} onClick={handleTranslateDescription}>
-                {game.translatedDescription
-                  ? (showTranslated ? '查看原文' : '查看译文')
-                  : '翻译介绍'}
-              </Button>
-            </Space>
-            <Paragraph style={{ color: textColor }} className="text-base leading-relaxed">
+      <Row gutter={[16, 16]}>
+        <Col xs={24} lg={16}>
+          <Card title="游戏介绍" className="mb-4" style={{ background: cardBg }}>
+            <Button loading={isTranslating} onClick={handleTranslateDescription} size="small" style={{ marginBottom: 12 }}>
+              {game.translatedDescription
+                ? (showTranslated ? '查看原文' : '查看译文')
+                : '翻译介绍'}
+            </Button>
+            <Paragraph style={{ color: textColor, fontSize: 14, lineHeight: 1.7 }}>
               {showTranslated
                 ? (game.translatedDescription || game.description_raw || game.description || '暂无描述')
                 : (game.description_raw || game.description || '暂无描述')}
@@ -218,11 +217,11 @@ const GameDetail = () => {
           </Card>
 
           {enhancedContent && (
-            <Card title="玩法速览" className="mb-6" style={{ background: cardBg }}>
-              <Row gutter={[16, 16]}>
+            <Card title="玩法速览" className="mb-4" style={{ background: cardBg }}>
+              <Row gutter={[12, 12]}>
                 <Col xs={24} md={12}>
                   <Title level={5}>核心亮点</Title>
-                  <ul style={{ color: textColor, paddingLeft: 18, marginBottom: 0 }}>
+                  <ul style={{ color: textColor, paddingLeft: 18, marginBottom: 0, fontSize: 13 }}>
                     {(enhancedContent.highlights || []).map((item, idx) => (
                       <li key={`hl-${idx}`}>{item}</li>
                     ))}
@@ -230,7 +229,7 @@ const GameDetail = () => {
                 </Col>
                 <Col xs={24} md={12}>
                   <Title level={5}>新手建议</Title>
-                  <ul style={{ color: textColor, paddingLeft: 18, marginBottom: 0 }}>
+                  <ul style={{ color: textColor, paddingLeft: 18, marginBottom: 0, fontSize: 13 }}>
                     {(enhancedContent.beginnerTips || []).map((item, idx) => (
                       <li key={`bt-${idx}`}>{item}</li>
                     ))}
@@ -238,7 +237,7 @@ const GameDetail = () => {
                 </Col>
                 <Col xs={24}>
                   <Title level={5}>进阶技巧</Title>
-                  <ul style={{ color: textColor, paddingLeft: 18, marginBottom: 0 }}>
+                  <ul style={{ color: textColor, paddingLeft: 18, marginBottom: 0, fontSize: 13 }}>
                     {(enhancedContent.advancedTips || []).map((item, idx) => (
                       <li key={`at-${idx}`}>{item}</li>
                     ))}
@@ -250,7 +249,7 @@ const GameDetail = () => {
                     <Collapse>
                       {enhancedContent.faq.map((item, idx) => (
                         <Panel header={item.q} key={`faq-${idx}`}>
-                          <Paragraph style={{ color: textColor, marginBottom: 0 }}>{item.a}</Paragraph>
+                          <Paragraph style={{ color: textColor, marginBottom: 0, fontSize: 13 }}>{item.a}</Paragraph>
                         </Panel>
                       ))}
                     </Collapse>
@@ -262,29 +261,29 @@ const GameDetail = () => {
 
           {/* Screenshots */}
           {game.screenshots?.length > 0 && (
-            <Card title="截图" className="mb-6" style={{ background: cardBg }}>
+            <Card title="截图" className="mb-4" style={{ background: cardBg }}>
               <Image.PreviewGroup>
-                <Space size={4} className="flex flex-wrap">
+                <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8 }}>
                   {game.screenshots.map((screenshot, index) => (
-                    <Image key={index} src={screenshot} width={200} className="rounded" />
+                    <Image key={index} src={screenshot} width={'calc(50% - 4px)'} className="rounded" />
                   ))}
-                </Space>
+                </div>
               </Image.PreviewGroup>
             </Card>
           )}
 
           {/* Platforms */}
-          <Card title="支持的平台" className="mb-6" style={{ background: cardBg }}>
-            <Space>
+          <Card title="支持的平台" className="mb-4" style={{ background: cardBg }}>
+            <Space wrap size={[4, 4]}>
               {game.platforms?.map(p => (
-                <Tag key={`platform-detail-${p.platform.id}`} color="blue">{p.platform.name}</Tag>
+                <Tag key={`platform-detail-${p.platform.id}`} style={{ fontSize: 12 }}>{p.platform.name}</Tag>
               ))}
             </Space>
           </Card>
 
-          <Card title="教程与外部攻略" className="mb-6" style={{ background: cardBg }}>
+          <Card title="教程与外部攻略" className="mb-4" style={{ background: cardBg }}>
             {tutorialLinks.length > 0 ? (
-              <Space direction="vertical" style={{ width: '100%' }}>
+              <Space direction="vertical" style={{ width: '100%' }} size={[8, 8]}>
                 {tutorialLinks.map((link) => (
                   <Button
                     key={link.url}
@@ -300,15 +299,15 @@ const GameDetail = () => {
                 ))}
               </Space>
             ) : (
-              <Paragraph style={{ color: textColor, marginBottom: 0 }}>
+              <Paragraph style={{ color: textColor, marginBottom: 0, fontSize: 13 }}>
                 暂无教程链接，可在 src/config/tutorialLinks.js 中为该游戏补充外部攻略地址。
               </Paragraph>
             )}
           </Card>
 
-          <Card title="下载" className="mb-6" style={{ background: cardBg }}>
+          <Card title="下载" className="mb-4" style={{ background: cardBg }}>
             {downloadLinks.length > 0 ? (
-              <Space direction="vertical" style={{ width: '100%' }}>
+              <Space direction="vertical" style={{ width: '100%' }} size={[8, 8]}>
                 {downloadLinks.map((link) => (
                   <Button
                     key={link.url}
@@ -322,20 +321,20 @@ const GameDetail = () => {
                     {link.title}
                   </Button>
                 ))}
-                <Paragraph type="secondary" style={{ marginBottom: 0 }}>
+                <Paragraph type="secondary" style={{ marginBottom: 0, fontSize: 12 }}>
                   进入夸克链接后，可按 Ctrl + F 搜索该游戏中文名快速定位。
                 </Paragraph>
               </Space>
             ) : (
-              <Paragraph style={{ color: textColor, marginBottom: 0 }}>
+              <Paragraph style={{ color: textColor, marginBottom: 0, fontSize: 13 }}>
                 暂无可用下载渠道链接。
               </Paragraph>
             )}
           </Card>
         </Col>
 
-        <Col xs={24} md={8}>
-          <Card title="游戏信息" className="mb-6" style={{ background: cardBg }}>
+        <Col xs={24} lg={8}>
+          <Card title="游戏信息" className="mb-4" style={{ background: cardBg }}>
             <Descriptions column={1} size="small">
               <Descriptions.Item label="开发商" style={{ color: textColor }}>
                 {game.developers?.map(d => d.name).join(', ') || '未知'}
@@ -349,7 +348,7 @@ const GameDetail = () => {
               <Descriptions.Item label="类型" style={{ color: textColor }}>
                 {game.genres?.map(g => g.name).join(', ')}
               </Descriptions.Item>
-              <Descriptions.Item label="Metacritic评分" style={{ color: textColor }}>
+              <Descriptions.Item label="评分" style={{ color: textColor }}>
                 {game.metacritic || '暂无'}
               </Descriptions.Item>
             </Descriptions>
@@ -357,10 +356,10 @@ const GameDetail = () => {
 
           {/* Tags */}
           {game.tags?.length > 0 && (
-            <Card title="标签" className="mb-6" style={{ background: cardBg }}>
-              <Space wrap>
+            <Card title="标签" className="mb-4" style={{ background: cardBg }}>
+              <Space wrap size={[4, 4]}>
                 {game.tags.slice(0, 15).map((tag, i) => (
-                  <Tag key={`tag-${tag.id || i}`}>{tag.name}</Tag>
+                  <Tag key={`tag-${tag.id || i}`} style={{ fontSize: 11 }}>{tag.name}</Tag>
                 ))}
               </Space>
             </Card>
@@ -368,14 +367,14 @@ const GameDetail = () => {
 
           {/* Requirements */}
           {game.requirements?.minimum && (
-            <Card title="系统要求" className="mb-6" style={{ background: cardBg }}>
+            <Card title="系统要求" className="mb-4" style={{ background: cardBg }}>
               <Collapse defaultActiveKey={['minimum']}>
                 <Panel header="最低配置" key="minimum">
-                  <pre className="whitespace-pre-wrap text-sm" style={{ color: textColor }}>{game.requirements.minimum}</pre>
+                  <pre className="whitespace-pre-wrap" style={{ color: textColor, fontSize: 12 }}>{game.requirements.minimum}</pre>
                 </Panel>
                 {game.requirements.recommended && (
                   <Panel header="推荐配置" key="recommended">
-                    <pre className="whitespace-pre-wrap text-sm" style={{ color: textColor }}>{game.requirements.recommended}</pre>
+                    <pre className="whitespace-pre-wrap" style={{ color: textColor, fontSize: 12 }}>{game.requirements.recommended}</pre>
                   </Panel>
                 )}
               </Collapse>

@@ -67,24 +67,23 @@ const Search = () => {
 
   return (
     <div>
-      <div style={{ marginBottom: 24 }}>
-        <Title level={2} style={{ color: textColor, marginBottom: 16 }}>
+      <div style={{ marginBottom: 16 }}>
+        <Title level={3} style={{ color: textColor, marginBottom: 12 }}>
           搜索游戏
         </Title>
 
         <Input.Search
-          placeholder="输入游戏名称进行搜索..."
-          size="large"
+          placeholder="输入游戏名称..."
+          size="middle"
           value={inputValue}
           onChange={(e) => setInputValue(e.target.value)}
           onSearch={handleSearch}
           enterButton={<SearchOutlined />}
-          style={{ maxWidth: 600 }}
         />
       </div>
 
       {loading ? (
-        <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: 300 }}>
+        <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: 250 }}>
           <Spin size="large" />
         </div>
       ) : searched ? (
@@ -98,10 +97,10 @@ const Search = () => {
           />
         ) : (
           <div>
-            <Text style={{ color: textSecondary, fontSize: 14 }}>
+            <Text style={{ color: textSecondary, fontSize: 13 }}>
               找到 {results.length} 个与 "{query}" 相关的游戏
             </Text>
-            <Row gutter={[16, 16]} style={{ marginTop: 16 }}>
+            <Row gutter={[12, 12]} style={{ marginTop: 12 }}>
               {results.map((game) => (
                 <Col key={game.id} xs={12} sm={8} md={6} lg={4}>
                   <GameCard game={game} />
@@ -111,9 +110,9 @@ const Search = () => {
           </div>
         )
       ) : (
-        <div style={{ textAlign: 'center', padding: '60px 0' }}>
-          <SearchOutlined style={{ fontSize: 48, color: textSecondary, marginBottom: 16 }} />
-          <p style={{ color: textSecondary, fontSize: 16 }}>输入关键词搜索游戏</p>
+        <div style={{ textAlign: 'center', padding: '40px 0' }}>
+          <SearchOutlined style={{ fontSize: 40, color: textSecondary, marginBottom: 12 }} />
+          <p style={{ color: textSecondary, fontSize: 14 }}>输入关键词搜索游戏</p>
         </div>
       )}
     </div>

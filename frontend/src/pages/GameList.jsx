@@ -108,35 +108,37 @@ const GameList = () => {
   return (
     <div>
       {loadError && (
-        <Alert type="error" showIcon message="游戏列表加载失败" description={loadError} style={{ marginBottom: 16 }} />
+        <Alert type="error" showIcon message="游戏列表加载失败" description={loadError} style={{ marginBottom: 12 }} />
       )}
       {/* Page Header */}
       <div
         style={{
           display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'space-between',
-          marginBottom: 24,
-          paddingBottom: 16,
+          flexDirection: 'column',
+          gap: 12,
+          marginBottom: 16,
+          paddingBottom: 12,
           borderBottom: `1px solid ${borderColor}`,
         }}
+        className="sm:flex-row sm:items-center sm:justify-between"
       >
         <div>
-          <h1 style={{ color: textColor, fontSize: 24, fontWeight: 700, margin: 0 }}>
+          <h1 style={{ color: textColor, fontSize: 20, fontWeight: 700, margin: 0 }}>
             游戏列表
           </h1>
-          <p style={{ color: textSecondary, fontSize: 13, margin: '4px 0 0 0' }}>
+          <p style={{ color: textSecondary, fontSize: 12, margin: '4px 0 0 0' }}>
             共 {pagination.count} 款游戏
           </p>
         </div>
 
-        <div style={{ display: 'flex', gap: 12 }}>
+        <div style={{ display: 'flex', gap: 8 }} className="flex-wrap">
           {/* Sort Dropdown */}
           <Select
             value={ordering}
             onChange={handleSortChange}
             options={sortOptions}
-            style={{ width: 140 }}
+            style={{ minWidth: 110 }}
+            size="middle"
           />
 
           {/* View Mode Toggle */}
@@ -180,7 +182,7 @@ const GameList = () => {
 
       {/* Game Grid */}
       {loading ? (
-        <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: 400 }}>
+        <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: 300 }}>
           <Spin size="large" />
         </div>
       ) : games.length === 0 ? (
@@ -188,11 +190,11 @@ const GameList = () => {
           description={
             <span style={{ color: textSecondary }}>{loadError ? '无法加载，请查看上方说明' : '暂无游戏数据'}</span>
           }
-          style={{ padding: 60 }}
+          style={{ padding: 40 }}
         />
       ) : (
         <>
-          <Row gutter={[16, 16]}>
+          <Row gutter={[12, 12]}>
             {games.map((game) => (
               <Col key={game.id} xs={12} sm={8} md={6} lg={4}>
                 <GameCard game={game} />
@@ -201,7 +203,7 @@ const GameList = () => {
           </Row>
 
           {/* Pagination */}
-          <div style={{ textAlign: 'center', marginTop: 40 }}>
+          <div style={{ textAlign: 'center', marginTop: 24, overflowX: 'auto' }}>
             <Pagination
               current={page}
               total={pagination.count}
@@ -209,10 +211,7 @@ const GameList = () => {
               onChange={handlePageChange}
               showSizeChanger={false}
               showQuickJumper
-              style={{
-                display: 'inline-flex',
-                gap: 8,
-              }}
+              size="small"
             />
           </div>
         </>

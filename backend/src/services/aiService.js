@@ -31,8 +31,8 @@ class AIService {
   }
 
   getAgent() {
-    const proxyUrl = process.env.PROXY_URL?.trim();
-    return proxyUrl ? new HttpsProxyAgent(proxyUrl) : undefined;
+    const proxyUrl = process.env.PROXY_URL || 'http://127.0.0.1:7897';
+    return new HttpsProxyAgent(proxyUrl);
   }
 
   async chatWithNVIDIA(messages) {
@@ -53,7 +53,8 @@ class AIService {
         'Authorization': `Bearer ${apiKey}`,
         'Content-Type': 'application/json'
       },
-      ...(agent ? { httpAgent: agent, httpsAgent: agent } : {}),
+      httpAgent: agent,
+      httpsAgent: agent,
       timeout: 120000
     });
 
@@ -78,7 +79,8 @@ class AIService {
         'Authorization': `Bearer ${apiKey}`,
         'Content-Type': 'application/json'
       },
-      ...(agent ? { httpAgent: agent, httpsAgent: agent } : {}),
+      httpAgent: agent,
+      httpsAgent: agent,
       timeout: 30000
     });
 

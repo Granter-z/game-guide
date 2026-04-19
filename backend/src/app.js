@@ -13,48 +13,7 @@ const app = express();
 
 connectDB();
 
-/** 浏览器 Origin 总是带协议；环境变量里常漏写 https://，这里补全以便匹配。 */
-function parseCorsOrigins(raw) {
-  const parts = (raw || '')
-    .split(',')
-    .map((s) => s.trim().replace(/\/$/, ''))
-    .filter(Boolean);
-  const out = new Set();
-  for (const p of parts) {
-    if (p === '*') {
-      out.add('*');
-      continue;
-    }
-    if (/^https?:\/\//i.test(p)) {
-      out.add(p);
-      continue;
-    }
-    if (/^(localhost|127\.0\.0\.1)/i.test(p)) {
-      out.add(`http://${p}`);
-      out.add(`https://${p}`);
-    } else {
-      out.add(`https://${p}`);
-    }
-  }
-  return [...out];
-}
-
-const allowedOrigins = parseCorsOrigins(process.env.CORS_ORIGIN);
-
-const allowAnyOrigin = allowedOrigins.includes('*');
-
-app.use(cors({
-  origin: (origin, callback) => {
-    // Allow server-to-server requests and tools without Origin (curl/Postman).
-    if (!origin) return callback(null, true);
-    if (allowedOrigins.length === 0 || allowAnyOrigin) return callback(null, true);
-    const normalized = origin.replace(/\/$/, '');
-    if (allowedOrigins.includes(normalized)) return callback(null, true);
-    // 勿传 Error，否则预检/跨域表现异常，浏览器端常变成「Network Error」
-    console.warn(`[cors] blocked origin: ${origin} (allowed: ${allowedOrigins.join(', ')})`);
-    return callback(null, false);
-  }
-}));
+app.use(cors());
 app.use(express.json());
 
 app.use('/api/games', gamesRouter);

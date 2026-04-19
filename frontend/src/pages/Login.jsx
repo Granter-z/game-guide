@@ -93,7 +93,7 @@ const Login = () => {
   );
 
   return (
-    <div className="max-w-4xl mx-auto">
+    <div className="max-w-md mx-auto px-2">
       <Card className="shadow-lg">
         <Tabs
           defaultActiveKey="login"
@@ -101,6 +101,7 @@ const Login = () => {
             { key: 'login', label: '登录', children: <LoginForm /> },
             { key: 'register', label: '注册', children: <RegisterForm /> }
           ]}
+          size="small"
         />
       </Card>
     </div>

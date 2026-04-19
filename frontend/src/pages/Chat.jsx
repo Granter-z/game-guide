@@ -32,44 +32,52 @@ const Chat = () => {
   };
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', height: 'calc(100vh - 180px)' }}>
+    <div style={{ display: 'flex', flexDirection: 'column', height: 'calc(100vh - 140px)' }} className="sm:calc(100vh - 180px)">
       {/* 头部 */}
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
+      <div 
+        style={{ 
+          display: 'flex', 
+          justifyContent: 'space-between', 
+          alignItems: 'flex-start', 
+          marginBottom: 12,
+          gap: 8
+        }}
+      >
         <div>
-          <Title level={2} style={{ color: textColor, margin: 0 }}>
-            <RobotOutlined style={{ marginRight: 8 }} />
-            AI 游戏推荐
+          <Title level={3} style={{ color: textColor, margin: 0 }}>
+            <RobotOutlined style={{ marginRight: 6 }} />
+            AI 推荐
           </Title>
-          <Text style={{ color: textSecondary }}>
-            告诉我你喜欢什么类型的游戏，AI会为你推荐
+          <Text style={{ color: textSecondary, fontSize: 12 }}>
+            告诉我你喜欢什么游戏
           </Text>
         </div>
-        <Button icon={<PlusOutlined />} onClick={createSession}>新对话</Button>
+        <Button icon={<PlusOutlined />} onClick={createSession} size="small">新对话</Button>
       </div>
 
       {/* 消息列表 */}
       <Card
-        style={{ flex: 1, overflow: 'auto', background: cardBg, marginBottom: 16 }}
-        styles={{ body: { height: '100%', overflow: 'auto', padding: '16px' } }}
+        style={{ flex: 1, overflow: 'auto', background: cardBg, marginBottom: 12 }}
+        styles={{ body: { height: '100%', overflow: 'auto', padding: '12px' } }}
       >
         {messages.length === 0 ? (
-          <div style={{ textAlign: 'center', padding: '60px 0', color: textSecondary }}>
-            <RobotOutlined style={{ fontSize: 48, marginBottom: 16 }} />
-            <p>开始对话，告诉我你喜欢什么游戏</p>
-            <p style={{ fontSize: 12, marginTop: 8 }}>
-              例如: "推荐一些开放世界的RPG游戏" / "我喜欢玩《塞尔达》，还有哪些类似的作品？"
+          <div style={{ textAlign: 'center', padding: '40px 0', color: textSecondary }}>
+            <RobotOutlined style={{ fontSize: 40, marginBottom: 12 }} />
+            <p style={{ fontSize: 14 }}>开始对话，告诉我你喜欢什么游戏</p>
+            <p style={{ fontSize: 11, marginTop: 8 }}>
+              例如: "推荐一些RPG游戏"
             </p>
           </div>
         ) : (
           <List
             dataSource={messages}
             renderItem={(msg) => (
-              <List.Item style={{ justifyContent: msg.role === 'user' ? 'flex-end' : 'flex-start', border: 'none', padding: '8px 0' }}>
-                <div style={{ maxWidth: '70%' }}>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 4 }}>
+              <List.Item style={{ justifyContent: msg.role === 'user' ? 'flex-end' : 'flex-start', border: 'none', padding: '6px 0' }}>
+                <div style={{ maxWidth: '85%' }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 4 }}>
                     {msg.role === 'assistant' ? <Avatar icon={<RobotOutlined />} size="small" style={{ background: '#ff4757' }} /> : null}
-                    <Text strong style={{ color: textSecondary, fontSize: 12 }}>
-                      {msg.role === 'user' ? '你' : 'AI 助手'}
+                    <Text strong style={{ color: textSecondary, fontSize: 11 }}>
+                      {msg.role === 'user' ? '你' : 'AI'}
                     </Text>
                   </div>
                   <Card
@@ -79,21 +87,21 @@ const Chat = () => {
                       color: msg.role === 'user' ? (isDark ? '#fff' : '#000') : textColor,
                       border: msg.role === 'user' ? 'none' : (isDark ? '1px solid #333' : '1px solid #e8e8e8')
                     }}
-                    styles={{ body: { padding: '12px' } }}
+                    styles={{ body: { padding: '10px' } }}
                   >
-                    <div style={{ whiteSpace: 'pre-wrap', lineHeight: 1.6 }}>{msg.content}</div>
+                    <div style={{ whiteSpace: 'pre-wrap', lineHeight: 1.5, fontSize: 13 }}>{msg.content}</div>
 
                     {/* AI 推荐的游戏卡片 */}
                     {msg.recommendations && msg.recommendations.length > 0 && (
-                      <div style={{ marginTop: 16 }}>
-                        <Text strong style={{ color: textColor, display: 'block', marginBottom: 8 }}>
-                          为你推荐的游戏:
+                      <div style={{ marginTop: 12 }}>
+                        <Text strong style={{ color: textColor, display: 'block', marginBottom: 6, fontSize: 12 }}>
+                          为你推荐:
                         </Text>
-                        <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8 }}>
+                        <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6 }}>
                           {msg.recommendations.map((game, idx) => (
                             <Tag
                               key={idx}
-                              style={{ cursor: 'pointer', padding: '4px 8px' }}
+                              style={{ cursor: 'pointer', padding: '2px 6px', fontSize: 11 }}
                               color="blue"
                               onClick={() => window.location.href = `/games/${game.slug}`}
                             >
@@ -110,23 +118,24 @@ const Chat = () => {
           />
         )}
         {isLoading && (
-          <div style={{ textAlign: 'center', padding: 16 }}>
-            <Spin tip="AI正在思考中..." />
+          <div style={{ textAlign: 'center', padding: 12 }}>
+            <Spin tip="思考中..." size="small" />
           </div>
         )}
         <div ref={messagesEndRef} />
       </Card>
 
       {/* 输入区域 */}
-      <Card style={{ background: cardBg }} styles={{ body: { padding: '12px 16px' } }}>
-        <div style={{ display: 'flex', gap: 8, alignItems: 'flex-end' }}>
+      <Card style={{ background: cardBg }} styles={{ body: { padding: '8px 12px' } }}>
+        <div style={{ display: 'flex', gap: 6, alignItems: 'flex-end' }}>
           <TextArea
-            placeholder="输入你的问题..."
-            autoSize={{ minRows: 1, maxRows: 4 }}
+            placeholder="输入问题..."
+            autoSize={{ minRows: 1, maxRows: 3 }}
             style={{
               flex: 1,
               background: inputBg,
-              borderRadius: 8,
+              borderRadius: 6,
+              fontSize: 14,
             }}
             value={inputValue}
             onChange={(e) => setInputValue(e.target.value)}
@@ -142,12 +151,13 @@ const Chat = () => {
             icon={<SendOutlined />}
             loading={isLoading}
             onClick={handleSend}
-            style={{ borderRadius: 8 }}
+            style={{ borderRadius: 6 }}
           />
           <Button
             icon={<ClearOutlined />}
             onClick={clearMessages}
-            style={{ borderRadius: 8 }}
+            style={{ borderRadius: 6 }}
+            size="small"
           />
         </div>
       </Card>

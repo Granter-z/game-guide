@@ -104,15 +104,23 @@ const Home = () => {
   return (
     <div>
       {loadError && (
-        <Alert type="error" showIcon message="游戏列表加载失败" description={loadError} style={{ marginBottom: 16 }} />
+        <Alert type="error" showIcon message="游戏列表加载失败" description={loadError} style={{ marginBottom: 12 }} />
       )}
       {/* Header */}
-      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 24 }}>
+      <div 
+        style={{ 
+          display: 'flex', 
+          flexDirection: 'column',
+          gap: 8,
+          marginBottom: 16 
+        }}
+        className="sm:flex-row sm:items-center sm:justify-between"
+      >
         <div>
-          <h1 style={{ color: textColor, fontSize: 28, fontWeight: 700, margin: 0 }}>
+          <h1 style={{ color: textColor, fontSize: 22, fontWeight: 700, margin: 0 }}>
             新潮与趋势
           </h1>
-          <p style={{ color: textSecondary, fontSize: 13, margin: '8px 0 0 0' }}>
+          <p style={{ color: textSecondary, fontSize: 12, margin: '4px 0 0 0' }}>
             基于玩家游玩、评分和讨论数据
           </p>
         </div>
@@ -120,12 +128,13 @@ const Home = () => {
           value={ordering}
           onChange={setOrdering}
           options={ORDERINGS}
-          style={{ width: 140 }}
+          style={{ minWidth: 110 }}
+          size="middle"
         />
       </div>
 
       {/* Game Grid */}
-      <Row gutter={[16, 16]}>
+      <Row gutter={[12, 12]}>
         {games.map((game, index) => {
           const isLast = index === games.length - 1;
           return (
@@ -147,14 +156,14 @@ const Home = () => {
 
       {/* Loading Indicator */}
       {loadingMore && (
-        <div style={{ textAlign: 'center', padding: 40 }}>
+        <div style={{ textAlign: 'center', padding: 24 }}>
           <Spin size="large" />
         </div>
       )}
 
       {/* End Message */}
       {!hasMore && games.length > 0 && (
-        <div style={{ textAlign: 'center', padding: 40, color: textSecondary }}>
+        <div style={{ textAlign: 'center', padding: 24, color: textSecondary }}>
           已加载全部 {games.length} 款游戏
         </div>
       )}

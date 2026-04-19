@@ -63,7 +63,7 @@ export const translateToChinese = async (text) => {
   if (!text) return '';
 
   const cached = getCachedTranslation(text);
-  if (cached) return cached;
+  if (cached) return { text: cached, engine: 'cache' };
 
   try {
     const { text: protectedText, protectedTerms } = protectGlossaryTerms(text);

@@ -4,16 +4,15 @@
     <meta charset="UTF-8" />
     <link rel="icon" type="image/svg+xml" href="/vite.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <!-- 前后端不同域名且构建时未注入 VITE_API_BASE_URL 时：填写后端根路径，须以 /api 结尾，例如 https://xxx.up.railway.app/api -->
+    <meta name="api-base-url" content="" />
     <title>Granter游戏图鉴</title>
-<<<<<<< HEAD
-    <script type="module" crossorigin src="/assets/index-CLAmuL-b.js"></script>
-    <link rel="stylesheet" crossorigin href="/assets/index-Dk6Cvk2O.css">
-=======
-    <script type="module" crossorigin src="/assets/index-CFz87htp.js"></script>
-    <link rel="stylesheet" crossorigin href="/assets/index-52UrZ9j9.css">
->>>>>>> a7d1111ec8da3cb7aa4e429aea4cedac9adef574
+    <script type="module" crossorigin src="/assets/index-CE7VOP3I.js"></script>
+    <link rel="stylesheet" crossorigin href="/assets/index-ClSH9wUM.css">
   </head>
   <body>
     <div id="root"></div>
+    <!-- 同步加载：必须在 React 之前执行，供 api.js 读取 window.__GAME_GUIDE_API_BASE__ -->
+    <script src="/runtime-config.js"></script>
   </body>
 </html>

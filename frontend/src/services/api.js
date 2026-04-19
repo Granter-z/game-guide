@@ -1,7 +1,17 @@
 import axios from 'axios';
 
-/** 前后端不同域名时：优先用构建变量；未设置时可读 index.html 里 meta（需重新部署静态资源）。 */
+/**
+ * API 根地址解析顺序：
+ * 1) window.__GAME_GUIDE_API_BASE__（public/runtime-config.js，可覆盖错误构建出的 /api）
+ * 2) Vite 构建变量 VITE_API_BASE_URL
+ * 3) meta[name="api-base-url"]
+ * 4) 默认 /api（仅前后端同域时可用）
+ */
 function resolveApiBaseUrl() {
+  if (typeof window !== 'undefined') {
+    const w = window.__GAME_GUIDE_API_BASE__;
+    if (typeof w === 'string' && w.trim()) return w.trim().replace(/\/$/, '');
+  }
   const fromEnv = import.meta.env.VITE_API_BASE_URL?.trim();
   if (fromEnv) return fromEnv.replace(/\/$/, '');
   if (typeof document !== 'undefined') {
@@ -25,7 +35,8 @@ export function describeApiError(error) {
   const detail = typeof body?.error === 'string' ? body.error : body?.message;
   const head = detail || error.message || '请求失败';
   if (!error.response) {
-    return `${head}。请确认已在构建时设置 VITE_API_BASE_URL 为后端地址（以 /api 结尾），且后端 CORS_ORIGIN 包含当前页面域名。`;
+    if (/HTML|收到 HTML|接口 JSON/i.test(head)) return head;
+    return `${head}。请填写 public/runtime-config.js 中的 window.__GAME_GUIDE_API_BASE__（以 /api 结尾），或在构建环境设置 BACKEND_API_BASE / VITE_API_BASE_URL；后端 CORS_ORIGIN 需包含当前页面域名。`;
   }
   if (status === 401 || status === 403) return head;
   return `${head}（HTTP ${status}）`;
@@ -48,7 +59,7 @@ api.interceptors.response.use(
       if (head.startsWith('<') || head.startsWith('<!')) {
         return Promise.reject(
           new Error(
-            '收到 HTML 页面而非接口 JSON（常见：请求打到了前端域名）。请将 VITE_API_BASE_URL 设为后端地址并以 /api 结尾，然后重新构建前端。'
+            '收到 HTML 而非接口 JSON：请求仍指向前端域名。请编辑 public/runtime-config.js，设置 window.__GAME_GUIDE_API_BASE__ = \"https://你的后端域名/api\" 后重新部署；或在 Railway 构建变量中设置 BACKEND_API_BASE 后执行 npm run build（已配置 prebuild 时会自动写入）。'
           )
         );
       }

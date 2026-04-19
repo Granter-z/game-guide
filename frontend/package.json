@@ -4,6 +4,7 @@
   "type": "module",
   "scripts": {
     "dev": "vite --port 3000",
+    "prebuild": "node scripts/write-runtime-api.mjs",
     "build": "vite build",
     "preview": "vite preview",
     "start": "serve -s dist -l tcp://0.0.0.0:$PORT"

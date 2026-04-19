@@ -31,8 +31,8 @@ class AIService {
   }
 
   getAgent() {
-    const proxyUrl = process.env.PROXY_URL?.trim();
-    return proxyUrl ? new HttpsProxyAgent(proxyUrl) : undefined;
+    const proxyUrl = process.env.PROXY_URL || 'http://127.0.0.1:7897';
+    return new HttpsProxyAgent(proxyUrl);
   }
 
   async chatWithNVIDIA(messages) {
@@ -42,24 +42,21 @@ class AIService {
     }
 
     const agent = this.getAgent();
-    const axiosConfig = {
-      headers: {
-        'Authorization': `Bearer ${apiKey}`,
-        'Content-Type': 'application/json'
-      },
-      timeout: 120000
-    };
-    if (agent) {
-      axiosConfig.httpAgent = agent;
-      axiosConfig.httpsAgent = agent;
-    }
 
     const response = await axios.post(NVIDIA_API_URL, {
       model: NVIDIA_MODEL,
       messages,
       temperature: 0.7,
       max_tokens: 1024
-    }, axiosConfig);
+    }, {
+      headers: {
+        'Authorization': `Bearer ${apiKey}`,
+        'Content-Type': 'application/json'
+      },
+      httpAgent: agent,
+      httpsAgent: agent,
+      timeout: 120000
+    });
 
     return response.data.choices[0].message.content;
   }
@@ -71,24 +68,21 @@ class AIService {
     }
 
     const agent = this.getAgent();
-    const axiosConfig = {
-      headers: {
-        'Authorization': `Bearer ${apiKey}`,
-        'Content-Type': 'application/json'
-      },
-      timeout: 30000
-    };
-    if (agent) {
-      axiosConfig.httpAgent = agent;
-      axiosConfig.httpsAgent = agent;
-    }
 
     const response = await axios.post(GROQ_API_URL, {
       model: GROQ_MODEL,
       messages,
       temperature: 0.7,
       max_tokens: 2048
-    }, axiosConfig);
+    }, {
+      headers: {
+        'Authorization': `Bearer ${apiKey}`,
+        'Content-Type': 'application/json'
+      },
+      httpAgent: agent,
+      httpsAgent: agent,
+      timeout: 30000
+    });
 
     return response.data.choices[0].message.content;
   }

@@ -77,11 +77,7 @@ const GameDetail = () => {
       const engine = translation?.engine || 'unknown';
       setGame((prev) => (prev ? { ...prev, translatedDescription: translatedText } : prev));
       setShowTranslated(true);
-      message.success(
-        `翻译完成（引擎：${
-          engine === 'baidu' ? '百度' : engine === 'ai' ? 'AI 兜底' : engine === 'cache' ? '本地缓存' : engine
-        }）`
-      );
+      message.success(`翻译完成（引擎：${engine === 'baidu' ? '百度' : engine === 'ai' ? 'AI 兜底' : engine}）`);
     } catch (error) {
       console.error('Translation failed:', error);
       message.error('翻译失败，请稍后重试');
@@ -180,7 +176,7 @@ const GameDetail = () => {
 
       {/* Action Buttons */}
       <Card className="shadow-sm" style={{ background: cardBg }}>
-        <Space size="large" wrap>
+        <Space size="large">
           <Button
             type={isFavorite ? 'primary' : 'default'}
             icon={<HeartOutlined />}
@@ -189,11 +185,6 @@ const GameDetail = () => {
             {isFavorite ? '已收藏' : '添加收藏'}
           </Button>
           <Button icon={<ShareAltOutlined />}>分享</Button>
-          <Button loading={isTranslating} onClick={handleTranslateDescription}>
-            {game.translatedDescription
-              ? (showTranslated ? '查看原文' : '查看译文')
-              : '翻译介绍'}
-          </Button>
         </Space>
 
         <div className="mt-4 flex items-center gap-4">
@@ -218,6 +209,13 @@ const GameDetail = () => {
       <Row gutter={24}>
         <Col xs={24} md={16}>
           <Card title="游戏介绍" className="mb-6" style={{ background: cardBg }}>
+            <Space className="mb-3">
+              <Button loading={isTranslating} onClick={handleTranslateDescription}>
+                {game.translatedDescription
+                  ? (showTranslated ? '查看原文' : '查看译文')
+                  : '翻译介绍'}
+              </Button>
+            </Space>
             <Paragraph style={{ color: textColor }} className="text-base leading-relaxed">
               {showTranslated
                 ? (game.translatedDescription || game.description_raw || game.description || '暂无描述')

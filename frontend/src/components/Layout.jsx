@@ -171,12 +171,12 @@ const Layout = () => {
         <AntLayout
           style={{
             background: bgPrimary,
+            marginLeft: 220,
           }}
         >
           <div
             style={{
               padding: '16px',
-              paddingLeft: 'clamp(16px, 4vw, 244px)',
               minHeight: 'calc(100vh - 64px)',
             }}
             className="w-full overflow-x-hidden"

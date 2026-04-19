@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import { Card } from 'antd';
 import { PlusOutlined, HeartOutlined } from '@ant-design/icons';
 import useThemeStore from '../store/themeStore';
+import { getDisplayGameName } from '../utils/gameName';
 
 const GameCard = ({ game, onAddFavorite }) => {
   const { theme } = useThemeStore();
@@ -15,6 +16,7 @@ const GameCard = ({ game, onAddFavorite }) => {
   const textTertiary = isDark ? '#666' : '#999999';
   const tagBg = isDark ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.08)';
   const boxShadow = isDark ? '0 8px 24px rgba(0,0,0,0.4)' : '0 2px 8px rgba(0,0,0,0.1)';
+  const displayName = getDisplayGameName(game);
 
   return (
     <Link to={`/games/${game.slug}`} className="block">
@@ -33,7 +35,7 @@ const GameCard = ({ game, onAddFavorite }) => {
           <div className="game-card-cover" style={{ position: 'relative', height: 180 }}>
             <img
               src={game.background_image || fallbackImage}
-              alt={game.name}
+              alt={displayName}
               loading="lazy"
               style={{
                 width: '100%',
@@ -92,7 +94,7 @@ const GameCard = ({ game, onAddFavorite }) => {
                 whiteSpace: 'nowrap',
               }}
             >
-              {game.name}
+              {displayName}
             </span>
           }
           description={

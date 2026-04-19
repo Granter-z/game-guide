@@ -1,12 +1,14 @@
 import React, { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import { Card, Row, Col, Typography, Descriptions, Tag, Rate, Spin, Button, Image, Collapse, Space, message } from 'antd';
-import { EnvironmentOutlined, HeartOutlined, ShareAltOutlined } from '@ant-design/icons';
+import { EnvironmentOutlined, HeartOutlined, ShareAltOutlined, LinkOutlined } from '@ant-design/icons';
 import { getGameBySlug } from '../services/rawgApi';
 import { addFavorite, removeFavorite, getFavorites } from '../services/api';
 import { translateToChinese } from '../services/translate';
 import useAuthStore from '../store/authStore';
 import useThemeStore from '../store/themeStore';
+import { getDisplayGameName } from '../utils/gameName';
+import { getTutorialLinksForGame, getDownloadLinksForGame } from '../config/tutorialLinks';
 
 const { Title, Paragraph } = Typography;
 const { Panel } = Collapse;
@@ -17,12 +19,19 @@ const GameDetail = () => {
   const [loading, setLoading] = useState(true);
   const [isFavorite, setIsFavorite] = useState(false);
   const [userRating, setUserRating] = useState(0);
+  const [isTranslating, setIsTranslating] = useState(false);
+  const [showTranslated, setShowTranslated] = useState(false);
   const { isAuthenticated } = useAuthStore();
   const { theme } = useThemeStore();
   const isDark = theme === 'dark';
 
   const cardBg = isDark ? '#242424' : '#ffffff';
   const textColor = isDark ? '#ffffff' : '#000000';
+  const heroImage = game?.background_image || game?.backgroundImage;
+  const displayName = getDisplayGameName(game);
+  const tutorialLinks = getTutorialLinksForGame(game, displayName);
+  const downloadLinks = getDownloadLinksForGame(game);
+  const enhancedContent = game?.enhancedContent;
 
   useEffect(() => {
     fetchGameDetail();
@@ -31,23 +40,9 @@ const GameDetail = () => {
   const fetchGameDetail = async () => {
     try {
       setLoading(true);
+      setShowTranslated(false);
       const res = await getGameBySlug(slug);
       const gameData = res.data;
-
-      // 后端已经返回截图，不需要单独请求
-      // gameData.screenshots 已经在后端返回
-
-      // 自动翻译描述
-      try {
-        if (gameData.description_raw || gameData.description) {
-          const translatedText = await translateToChinese(gameData.description_raw || gameData.description);
-          gameData.translatedDescription = translatedText;
-        }
-      } catch (e) {
-        console.error('Translation failed:', e);
-        gameData.translatedDescription = gameData.description_raw || gameData.description;
-      }
-
       setGame(gameData);
 
       if (isAuthenticated) {
@@ -58,6 +53,36 @@ const GameDetail = () => {
       console.error('Failed to fetch game:', error);
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handleTranslateDescription = async () => {
+    if (!game) return;
+
+    if (game.translatedDescription) {
+      setShowTranslated((prev) => !prev);
+      return;
+    }
+
+    const rawDescription = game.description_raw || game.description;
+    if (!rawDescription) {
+      message.info('当前游戏暂无可翻译的介绍');
+      return;
+    }
+
+    try {
+      setIsTranslating(true);
+      const translation = await translateToChinese(rawDescription);
+      const translatedText = translation?.text || rawDescription;
+      const engine = translation?.engine || 'unknown';
+      setGame((prev) => (prev ? { ...prev, translatedDescription: translatedText } : prev));
+      setShowTranslated(true);
+      message.success(`翻译完成（引擎：${engine === 'baidu' ? '百度' : engine === 'ai' ? 'AI 兜底' : engine}）`);
+    } catch (error) {
+      console.error('Translation failed:', error);
+      message.error('翻译失败，请稍后重试');
+    } finally {
+      setIsTranslating(false);
     }
   };
 
@@ -72,7 +97,7 @@ const GameDetail = () => {
         setIsFavorite(false);
         message.success('已取消收藏');
       } else {
-        await addFavorite(game.id.toString(), { name: game.name, background_image: game.background_image });
+        await addFavorite(game.id.toString(), { name: displayName, background_image: heroImage });
         setIsFavorite(true);
         message.success('已添加到收藏');
       }
@@ -113,8 +138,8 @@ const GameDetail = () => {
         }}
       >
         <img
-          src={game.background_image}
-          alt={game.name}
+          src={heroImage}
+          alt={displayName}
           style={{
             width: '100%',
             height: 'auto',
@@ -131,7 +156,7 @@ const GameDetail = () => {
           }}
         />
         <div className="absolute bottom-0 left-0 p-6 md:p-10 w-full">
-          <Title level={1} style={{ color: isDark ? '#fff' : '#000', marginBottom: 8 }}>{game.name}</Title>
+          <Title level={1} style={{ color: isDark ? '#fff' : '#000', marginBottom: 8 }}>{displayName}</Title>
           <Space className="flex flex-wrap gap-2">
             {game.genres?.map(g => (
               <Tag key={`genre-${g.id}`} color="blue">{g.name}</Tag>
@@ -178,10 +203,62 @@ const GameDetail = () => {
       <Row gutter={24}>
         <Col xs={24} md={16}>
           <Card title="游戏介绍" className="mb-6" style={{ background: cardBg }}>
+            <Space className="mb-3">
+              <Button loading={isTranslating} onClick={handleTranslateDescription}>
+                {game.translatedDescription
+                  ? (showTranslated ? '查看原文' : '查看译文')
+                  : '翻译介绍'}
+              </Button>
+            </Space>
             <Paragraph style={{ color: textColor }} className="text-base leading-relaxed">
-              {game.translatedDescription || game.description_raw || game.description || '暂无描述'}
+              {showTranslated
+                ? (game.translatedDescription || game.description_raw || game.description || '暂无描述')
+                : (game.description_raw || game.description || '暂无描述')}
             </Paragraph>
           </Card>
+
+          {enhancedContent && (
+            <Card title="玩法速览" className="mb-6" style={{ background: cardBg }}>
+              <Row gutter={[16, 16]}>
+                <Col xs={24} md={12}>
+                  <Title level={5}>核心亮点</Title>
+                  <ul style={{ color: textColor, paddingLeft: 18, marginBottom: 0 }}>
+                    {(enhancedContent.highlights || []).map((item, idx) => (
+                      <li key={`hl-${idx}`}>{item}</li>
+                    ))}
+                  </ul>
+                </Col>
+                <Col xs={24} md={12}>
+                  <Title level={5}>新手建议</Title>
+                  <ul style={{ color: textColor, paddingLeft: 18, marginBottom: 0 }}>
+                    {(enhancedContent.beginnerTips || []).map((item, idx) => (
+                      <li key={`bt-${idx}`}>{item}</li>
+                    ))}
+                  </ul>
+                </Col>
+                <Col xs={24}>
+                  <Title level={5}>进阶技巧</Title>
+                  <ul style={{ color: textColor, paddingLeft: 18, marginBottom: 0 }}>
+                    {(enhancedContent.advancedTips || []).map((item, idx) => (
+                      <li key={`at-${idx}`}>{item}</li>
+                    ))}
+                  </ul>
+                </Col>
+                {(enhancedContent.faq || []).length > 0 && (
+                  <Col xs={24}>
+                    <Title level={5}>常见问题</Title>
+                    <Collapse>
+                      {enhancedContent.faq.map((item, idx) => (
+                        <Panel header={item.q} key={`faq-${idx}`}>
+                          <Paragraph style={{ color: textColor, marginBottom: 0 }}>{item.a}</Paragraph>
+                        </Panel>
+                      ))}
+                    </Collapse>
+                  </Col>
+                )}
+              </Row>
+            </Card>
+          )}
 
           {/* Screenshots */}
           {game.screenshots?.length > 0 && (
@@ -203,6 +280,57 @@ const GameDetail = () => {
                 <Tag key={`platform-detail-${p.platform.id}`} color="blue">{p.platform.name}</Tag>
               ))}
             </Space>
+          </Card>
+
+          <Card title="教程与外部攻略" className="mb-6" style={{ background: cardBg }}>
+            {tutorialLinks.length > 0 ? (
+              <Space direction="vertical" style={{ width: '100%' }}>
+                {tutorialLinks.map((link) => (
+                  <Button
+                    key={link.url}
+                    type="link"
+                    icon={<LinkOutlined />}
+                    href={link.url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    style={{ paddingLeft: 0 }}
+                  >
+                    {link.title}
+                  </Button>
+                ))}
+              </Space>
+            ) : (
+              <Paragraph style={{ color: textColor, marginBottom: 0 }}>
+                暂无教程链接，可在 src/config/tutorialLinks.js 中为该游戏补充外部攻略地址。
+              </Paragraph>
+            )}
+          </Card>
+
+          <Card title="下载" className="mb-6" style={{ background: cardBg }}>
+            {downloadLinks.length > 0 ? (
+              <Space direction="vertical" style={{ width: '100%' }}>
+                {downloadLinks.map((link) => (
+                  <Button
+                    key={link.url}
+                    type="link"
+                    icon={<LinkOutlined />}
+                    href={link.url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    style={{ paddingLeft: 0 }}
+                  >
+                    {link.title}
+                  </Button>
+                ))}
+                <Paragraph type="secondary" style={{ marginBottom: 0 }}>
+                  进入夸克链接后，可按 Ctrl + F 搜索该游戏中文名快速定位。
+                </Paragraph>
+              </Space>
+            ) : (
+              <Paragraph style={{ color: textColor, marginBottom: 0 }}>
+                暂无可用下载渠道链接。
+              </Paragraph>
+            )}
           </Card>
         </Col>
 

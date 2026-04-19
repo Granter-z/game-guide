@@ -9,7 +9,8 @@ const ORDERINGS = [
   { value: '-metacritic', label: '评分最高' },
   { value: '-released', label: '最近发布' },
   { value: '-rating', label: '评分最佳' },
-  { value: '-name', label: '名称 A-Z' },
+  { value: 'name', label: '名称 A-Z' },
+  { value: '-name', label: '名称 Z-A' },
 ];
 
 const Home = () => {
@@ -20,7 +21,7 @@ const Home = () => {
   const [loadingMore, setLoadingMore] = useState(false);
   const [page, setPage] = useState(1);
   const [hasMore, setHasMore] = useState(true);
-  const [ordering, setOrdering] = useState('-added');
+  const [ordering, setOrdering] = useState('-metacritic');
 
   const observerRef = useRef();
   const lastGameRef = useRef(null);
@@ -71,25 +72,7 @@ const Home = () => {
     }
   }, [page, loadingMore, hasMore, ordering]);
 
-  // Intersection Observer
-  useEffect(() => {
-    const observer = new IntersectionObserver(
-      (entries) => {
-        if (entries[0].isIntersecting && hasMore && !loadingMore) {
-          loadMore();
-        }
-      },
-      { rootMargin: '200px', threshold: 0 }
-    );
-
-    if (lastGameRef.current) {
-      observer.observe(lastGameRef.current);
-    }
-
-    return () => observer.disconnect();
-  }, [loadMore, hasMore, loadingMore]);
-
-  // Update last element ref when games change
+  // Keep only one observer to avoid duplicate loadMore triggers.
   useEffect(() => {
     if (games.length > 0 && lastGameRef.current) {
       observerRef.current?.disconnect();

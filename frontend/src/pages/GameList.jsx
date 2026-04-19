@@ -31,8 +31,10 @@ const GameList = () => {
   const ordering = searchParams.get('ordering') || '-metacritic';
   const filters = {
     genres: searchParams.get('genres'),
+    platforms: searchParams.get('platforms'),
     ordering,
     metacritic: searchParams.get('metacritic'),
+    dates: searchParams.get('dates'),
     search: searchParams.get('q')
   };
 
@@ -94,8 +96,8 @@ const GameList = () => {
     { value: '-released', label: '最新发布' },
     { value: 'released', label: '最早发布' },
     { value: '-added', label: '最受关注' },
-    { value: '-name', label: '名称 A-Z' },
-    { value: 'name', label: '名称 Z-A' },
+    { value: 'name', label: '名称 A-Z' },
+    { value: '-name', label: '名称 Z-A' },
   ];
 
   return (

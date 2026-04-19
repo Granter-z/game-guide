@@ -1,12 +1,4 @@
-import axios from 'axios';
-
-// 使用后端代理 API，隐藏 RAWG API Key
-const API_BASE_URL = 'http://localhost:4000/api';
-
-const apiClient = axios.create({
-  baseURL: API_BASE_URL,
-  timeout: 15000,
-});
+import apiClient from './api';
 
 export const getGames = (params) => apiClient.get('/games', { params });
 export const getGameBySlug = (slug) => apiClient.get(`/games/${slug}`);

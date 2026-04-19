@@ -22,6 +22,20 @@ const Layout = () => {
 
   const bgPrimary = isDark ? '#151515' : '#f0f2f5';
   const bgSecondary = isDark ? '#1e1e1e' : '#ffffff';
+  const today = new Date();
+
+  const toDateString = (date) => date.toISOString().slice(0, 10);
+  const addDays = (date, days) => {
+    const value = new Date(date);
+    value.setDate(value.getDate() + days);
+    return value;
+  };
+  const buildDatesParam = (start, end) => `${toDateString(start)},${toDateString(end)}`;
+
+  const recent30Dates = buildDatesParam(addDays(today, -30), today);
+  const upcoming90Dates = buildDatesParam(today, addDays(today, 90));
+  const thisYearDates = buildDatesParam(new Date(today.getFullYear(), 0, 1), new Date(today.getFullYear(), 11, 31));
+  const pathnameWithSearch = `${location.pathname}${location.search}`;
 
   const menuItems = [
     {
@@ -55,8 +69,18 @@ const Layout = () => {
       icon: <FireOutlined />,
       label: '新发售',
       children: [
-        { key: '/games?ordering=-released', label: <Link to="/games?ordering=-released">最近30天</Link> },
-        { key: '/calendar', label: '发售日历' },
+        {
+          key: `/games?ordering=-released&dates=${recent30Dates}`,
+          label: <Link to={`/games?ordering=-released&dates=${recent30Dates}`}>最近30天</Link>
+        },
+        {
+          key: `/games?ordering=released&dates=${upcoming90Dates}`,
+          label: <Link to={`/games?ordering=released&dates=${upcoming90Dates}`}>即将发售</Link>
+        },
+        {
+          key: `/games?ordering=-released&dates=${thisYearDates}`,
+          label: <Link to={`/games?ordering=-released&dates=${thisYearDates}`}>今年发售</Link>
+        },
       ],
     },
     {
@@ -66,7 +90,8 @@ const Layout = () => {
       children: [
         { key: '/games?ordering=-metacritic', label: <Link to="/games?ordering=-metacritic">评分最高</Link> },
         { key: '/games?ordering=-added', label: <Link to="/games?ordering=-added">最受关注</Link> },
-        { key: '/top=250', label: <Link to="/games?top=250">Top 250</Link> },
+        { key: '/games?ordering=-rating', label: <Link to="/games?ordering=-rating">玩家口碑</Link> },
+        { key: '/games?ordering=-metacritic&metacritic=80,100', label: <Link to="/games?ordering=-metacritic&metacritic=80,100">Top 250（高分池）</Link> },
       ],
     },
   ];
@@ -96,7 +121,8 @@ const Layout = () => {
           <Menu
             mode="inline"
             theme={menuTheme}
-            selectedKeys={[location.pathname]}
+            selectedKeys={[pathnameWithSearch]}
+            defaultOpenKeys={['new-releases', 'top']}
             items={menuItems}
             style={{ background: 'transparent', borderRight: 0 }}
           />

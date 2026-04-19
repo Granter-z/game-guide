@@ -24,7 +24,10 @@ const Header = () => {
   const { user, isAuthenticated, logout } = useAuthStore();
   const { theme, toggleTheme } = useThemeStore();
   const setMobileNavOpen = useUiStore((s) => s.setMobileNavOpen);
+<<<<<<< HEAD
   const isDesktop = useUiStore((s) => s.isDesktop);
+=======
+>>>>>>> a7d1111ec8da3cb7aa4e429aea4cedac9adef574
 
   const isDark = theme === 'dark';
   const bgPrimary = isDark ? '#1e1e1e' : '#ffffff';
@@ -186,6 +189,7 @@ const Header = () => {
           </Button>
         </Dropdown>
 
+<<<<<<< HEAD
         {/* Mobile Menu（不依赖 Tailwind 断点，避免线上旧 CSS 时按钮缺失） */}
         {!isDesktop ? (
           <Button
@@ -195,6 +199,16 @@ const Header = () => {
             aria-label="打开导航菜单"
           />
         ) : null}
+=======
+        {/* Mobile Menu */}
+        <Button
+          type="text"
+          icon={<MenuOutlined style={{ color: textColor }} />}
+          className="md:hidden"
+          onClick={() => setMobileNavOpen(true)}
+          aria-label="打开导航菜单"
+        />
+>>>>>>> a7d1111ec8da3cb7aa4e429aea4cedac9adef574
       </div>
     </AntHeader>
   );

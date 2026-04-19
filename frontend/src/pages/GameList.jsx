@@ -104,13 +104,17 @@ const GameList = () => {
     <div>
       {/* Page Header */}
       <div
-        className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between mb-6 pb-4"
         style={{
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'space-between',
+          marginBottom: 24,
+          paddingBottom: 16,
           borderBottom: `1px solid ${borderColor}`,
         }}
       >
-        <div className="min-w-0">
-          <h1 className="text-xl sm:text-2xl font-bold m-0" style={{ color: textColor }}>
+        <div>
+          <h1 style={{ color: textColor, fontSize: 24, fontWeight: 700, margin: 0 }}>
             游戏列表
           </h1>
           <p style={{ color: textSecondary, fontSize: 13, margin: '4px 0 0 0' }}>
@@ -118,13 +122,13 @@ const GameList = () => {
           </p>
         </div>
 
-        <div className="flex flex-wrap items-center gap-3">
+        <div style={{ display: 'flex', gap: 12 }}>
           {/* Sort Dropdown */}
           <Select
             value={ordering}
             onChange={handleSortChange}
             options={sortOptions}
-            className="min-w-0 w-full max-w-[200px] sm:w-[140px]"
+            style={{ width: 140 }}
           />
 
           {/* View Mode Toggle */}
@@ -195,14 +199,9 @@ const GameList = () => {
               onChange={handlePageChange}
               showSizeChanger={false}
               showQuickJumper
-              responsive
-              size="small"
               style={{
                 display: 'inline-flex',
                 gap: 8,
-                flexWrap: 'wrap',
-                justifyContent: 'center',
-                maxWidth: '100%',
               }}
             />
           </div>

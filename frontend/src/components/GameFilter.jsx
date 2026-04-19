@@ -71,11 +71,11 @@ const GameFilter = ({ onFilterChange, loading }) => {
         <span style={{ color: textSecondary, fontSize: 14 }}>筛选条件</span>
       </div>
 
-      <Space wrap size={12} className="w-full">
+      <Space wrap size={12}>
         <Select
           placeholder="游戏类型"
           allowClear
-          className="w-full min-w-0 sm:!w-40"
+          style={{ width: 160 }}
           value={selectedGenre}
           onChange={setSelectedGenre}
           options={genres.map(g => ({ value: g.slug, label: g.name }))}
@@ -84,13 +84,13 @@ const GameFilter = ({ onFilterChange, loading }) => {
         <Select
           placeholder="游戏平台"
           allowClear
-          className="w-full min-w-0 sm:!w-40"
+          style={{ width: 160 }}
           value={selectedPlatform}
           onChange={setSelectedPlatform}
           options={platforms.map(p => ({ value: p.id.toString(), label: p.name }))}
         />
 
-        <div className="flex w-full min-w-0 flex-col gap-2 sm:flex-row sm:items-center sm:w-auto">
+        <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
           <span style={{ color: textSecondary, fontSize: 13 }}>评分:</span>
           <Slider
             range
@@ -98,7 +98,7 @@ const GameFilter = ({ onFilterChange, loading }) => {
             max={100}
             value={metacriticRange}
             onChange={setMetacriticRange}
-            className="w-full sm:w-[140px] md:w-[180px] m-0"
+            style={{ width: 100 }}
           />
           <span style={{ color: textSecondary, fontSize: 12, minWidth: 45 }}>
             {metacriticRange[0]}-{metacriticRange[1]}

@@ -1,10 +1,6 @@
-<<<<<<< HEAD
-import React, { useEffect, useLayoutEffect } from 'react';
-=======
-import React, { useEffect } from 'react';
->>>>>>> a7d1111ec8da3cb7aa4e429aea4cedac9adef574
+import React from 'react';
 import { Outlet, Link, useLocation } from 'react-router-dom';
-import { Layout as AntLayout, Menu, Drawer } from 'antd';
+import { Layout as AntLayout, Menu } from 'antd';
 import {
   HomeOutlined,
   AppstoreOutlined,
@@ -16,7 +12,6 @@ import {
 } from '@ant-design/icons';
 import Header from './Header';
 import useThemeStore from '../store/themeStore';
-import useUiStore from '../store/uiStore';
 
 const { Sider } = AntLayout;
 
@@ -24,13 +19,6 @@ const Layout = () => {
   const location = useLocation();
   const { theme } = useThemeStore();
   const isDark = theme === 'dark';
-  const mobileNavOpen = useUiStore((s) => s.mobileNavOpen);
-  const setMobileNavOpen = useUiStore((s) => s.setMobileNavOpen);
-<<<<<<< HEAD
-  const isDesktop = useUiStore((s) => s.isDesktop);
-  const setIsDesktop = useUiStore((s) => s.setIsDesktop);
-=======
->>>>>>> a7d1111ec8da3cb7aa4e429aea4cedac9adef574
 
   const bgPrimary = isDark ? '#151515' : '#f0f2f5';
   const bgSecondary = isDark ? '#1e1e1e' : '#ffffff';
@@ -110,95 +98,25 @@ const Layout = () => {
 
   const menuTheme = isDark ? 'dark' : 'light';
 
-<<<<<<< HEAD
-  useLayoutEffect(() => {
-    const mq = window.matchMedia('(min-width: 768px)');
-    const apply = () => setIsDesktop(mq.matches);
-    apply();
-    mq.addEventListener('change', apply);
-    return () => mq.removeEventListener('change', apply);
-  }, [setIsDesktop]);
-
-=======
->>>>>>> a7d1111ec8da3cb7aa4e429aea4cedac9adef574
-  useEffect(() => {
-    setMobileNavOpen(false);
-  }, [location.pathname, location.search, setMobileNavOpen]);
-
-<<<<<<< HEAD
-  useEffect(() => {
-    if (isDesktop) {
-      setMobileNavOpen(false);
-    }
-  }, [isDesktop, setMobileNavOpen]);
-
-=======
->>>>>>> a7d1111ec8da3cb7aa4e429aea4cedac9adef574
   return (
-    <AntLayout className="min-h-screen overflow-x-hidden" style={{ background: bgPrimary }}>
+    <AntLayout className="min-h-screen" style={{ background: bgPrimary }}>
       {/* Top Header */}
       <Header />
 
-      <AntLayout hasSider={isDesktop} style={{ background: bgPrimary }}>
-        {/* 桌面端才挂载 Sider，避免 ant-layout-has-sider 在窄屏下仍按侧栏 flex 排版 */}
-        {isDesktop ? (
-          <Sider
-            width={220}
-            className="sidebar"
-            style={{
-              background: bgSecondary,
-              position: 'fixed',
-              left: 0,
-              top: 64,
-              bottom: 0,
-              overflow: 'auto',
-              borderRight: isDark ? '1px solid #2a2a2a' : '1px solid #e8e8e8',
-            }}
-          >
-            <Menu
-              mode="inline"
-              theme={menuTheme}
-              selectedKeys={[pathnameWithSearch]}
-              defaultOpenKeys={['new-releases', 'top']}
-              items={menuItems}
-              style={{ background: 'transparent', borderRight: 0 }}
-            />
-          </Sider>
-        ) : null}
-
-        {/* Main Content */}
-        <AntLayout
+      <AntLayout hasSider style={{ background: bgPrimary }}>
+        {/* Left Sidebar */}
+        <Sider
+          width={220}
+          className="sidebar hidden md:block"
           style={{
-            background: bgPrimary,
+            background: bgSecondary,
+            position: 'fixed',
+            left: 0,
+            top: 64,
+            bottom: 0,
+            overflow: 'auto',
+            borderRight: isDark ? '1px solid #2a2a2a' : '1px solid #e8e8e8',
           }}
-        >
-<<<<<<< HEAD
-          <div
-            className="min-h-[calc(100vh-64px)]"
-            style={{
-              paddingLeft: isDesktop ? 244 : 12,
-              paddingRight: isDesktop ? 24 : 12,
-              paddingTop: isDesktop ? 24 : 16,
-              paddingBottom: isDesktop ? 24 : 16,
-            }}
-          >
-=======
-          <div className="min-h-[calc(100vh-64px)] px-3 py-4 sm:px-5 sm:py-5 md:pl-[244px] md:pr-6 md:py-6">
->>>>>>> a7d1111ec8da3cb7aa4e429aea4cedac9adef574
-            <Outlet />
-          </div>
-        </AntLayout>
-      </AntLayout>
-
-<<<<<<< HEAD
-      {!isDesktop ? (
-        <Drawer
-          title="导航"
-          placement="left"
-          width={280}
-          open={mobileNavOpen}
-          onClose={() => setMobileNavOpen(false)}
-          styles={{ body: { padding: 0 } }}
         >
           <Menu
             mode="inline"
@@ -207,31 +125,26 @@ const Layout = () => {
             defaultOpenKeys={['new-releases', 'top']}
             items={menuItems}
             style={{ background: 'transparent', borderRight: 0 }}
-            onClick={() => setMobileNavOpen(false)}
           />
-        </Drawer>
-      ) : null}
-=======
-      <Drawer
-        title="导航"
-        placement="left"
-        width={280}
-        open={mobileNavOpen}
-        onClose={() => setMobileNavOpen(false)}
-        styles={{ body: { padding: 0 } }}
-        className="md:hidden"
-      >
-        <Menu
-          mode="inline"
-          theme={menuTheme}
-          selectedKeys={[pathnameWithSearch]}
-          defaultOpenKeys={['new-releases', 'top']}
-          items={menuItems}
-          style={{ background: 'transparent', borderRight: 0 }}
-          onClick={() => setMobileNavOpen(false)}
-        />
-      </Drawer>
->>>>>>> a7d1111ec8da3cb7aa4e429aea4cedac9adef574
+        </Sider>
+
+        {/* Main Content */}
+        <AntLayout
+          style={{
+            background: bgPrimary,
+          }}
+        >
+          <div
+            style={{
+              padding: '24px',
+              paddingLeft: '244px',
+              minHeight: 'calc(100vh - 64px)',
+            }}
+          >
+            <Outlet />
+          </div>
+        </AntLayout>
+      </AntLayout>
     </AntLayout>
   );
 };

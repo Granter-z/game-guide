@@ -39,6 +39,25 @@ api.interceptors.request.use((config) => {
   return config;
 });
 
+// 静态站 SPA 兜底常返回 200 + HTML；Axios 解析 JSON 失败时会把 data 留成字符串，导致「网络全绿但列表为空」。
+api.interceptors.response.use(
+  (response) => {
+    const d = response.data;
+    if (typeof d === 'string') {
+      const head = d.trimStart();
+      if (head.startsWith('<') || head.startsWith('<!')) {
+        return Promise.reject(
+          new Error(
+            '收到 HTML 页面而非接口 JSON（常见：请求打到了前端域名）。请将 VITE_API_BASE_URL 设为后端地址并以 /api 结尾，然后重新构建前端。'
+          )
+        );
+      }
+    }
+    return response;
+  },
+  (err) => Promise.reject(err)
+);
+
 export const getGames = (params) => api.get('/games', { params });
 export const getGameBySlug = (slug) => api.get(`/games/${slug}`);
 export const searchGames = (query, page) => api.get('/games/search', { params: { q: query, page } });

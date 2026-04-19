@@ -1,6 +1,16 @@
 import apiClient from './api';
 
-export const getGames = (params) => apiClient.get('/games', { params });
+export const getGames = async (params) => {
+  const res = await apiClient.get('/games', { params });
+  const d = res.data;
+  if (!d || typeof d !== 'object' || Array.isArray(d)) {
+    throw new Error('游戏列表接口返回格式异常（不是 JSON 对象）。');
+  }
+  if (!Array.isArray(d.results)) {
+    throw new Error(`游戏列表缺少 results 数组，实际字段：${Object.keys(d).join(', ') || '无'}`);
+  }
+  return res;
+};
 export const getGameBySlug = (slug) => apiClient.get(`/games/${slug}`);
 export const searchGames = (query, page) => apiClient.get('/games/search', { params: { q: query, page } });
 export const getGenres = () => apiClient.get('/games/genres');

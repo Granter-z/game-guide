@@ -36,7 +36,10 @@ export function describeApiError(error) {
   const head = detail || error.message || '请求失败';
   if (!error.response) {
     if (/HTML|收到 HTML|接口 JSON/i.test(head)) return head;
-    return `${head}。请填写 public/runtime-config.js 中的 window.__GAME_GUIDE_API_BASE__（以 /api 结尾），或在构建环境设置 BACKEND_API_BASE / VITE_API_BASE_URL；后端 CORS_ORIGIN 需包含当前页面域名。`;
+    if (/network error|err_network|failed to fetch/i.test(head)) {
+      return `${head}。多为跨域：请在后端环境变量 CORS_ORIGIN 中加入你打开本站时地址栏里的完整域名（例如 https://你的前端.up.railway.app，不要末尾斜杠）；多个用英文逗号分隔。排查时可临时设为 *。`;
+    }
+    return `${head}。若已配置 runtime-config：请确认后端地址可访问，且 CORS_ORIGIN 包含当前页面域名。`;
   }
   if (status === 401 || status === 403) return head;
   return `${head}（HTTP ${status}）`;

@@ -1,16 +1,11 @@
 const axios = require('axios');
-const { HttpsProxyAgent } = require('https-proxy-agent');
 
 const RAWG_BASE_URL = 'https://api.rawg.io/api';
 
 const fetchFromRAWG = async (endpoint, params = {}) => {
   const apiKey = process.env.RAWG_API_KEY;
-  const proxyUrl = process.env.PROXY_URL || 'http://127.0.0.1:7897';
-  const agent = new HttpsProxyAgent(proxyUrl);
   const response = await axios.get(`${RAWG_BASE_URL}${endpoint}`, {
     params: { key: apiKey, ...params },
-    httpAgent: agent,
-    httpsAgent: agent,
     timeout: 15000
   });
   return response.data;

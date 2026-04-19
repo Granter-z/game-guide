@@ -12,12 +12,11 @@ const fetchFromRAWG = async (endpoint, params = {}) => {
   if (!apiKey) {
     throw new Error('RAWG API key not configured');
   }
-  const proxyUrl = process.env.PROXY_URL || 'http://127.0.0.1:7897';
-  const agent = new HttpsProxyAgent(proxyUrl);
+  const proxyUrl = process.env.PROXY_URL?.trim();
+  const agent = proxyUrl ? new HttpsProxyAgent(proxyUrl) : undefined;
   const response = await axios.get(`${RAWG_BASE_URL}${endpoint}`, {
     params: { key: apiKey, ...params },
-    httpAgent: agent,
-    httpsAgent: agent,
+    ...(agent ? { httpAgent: agent, httpsAgent: agent } : {}),
     timeout: 15000
   });
   return response.data;

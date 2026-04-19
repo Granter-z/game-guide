@@ -1,7 +1,0 @@
-name = "rawg-proxy"
-main = "rawg-proxy.js"
-compatibility_date = "2024-01-01"
-
-[vars]
-# RAWG API Key - 可以在这里配置，或通过环境变量
-RAWG_API_KEY = "e59ef34a1dc24a11a368041c077f9eb8"

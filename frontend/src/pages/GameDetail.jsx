@@ -155,8 +155,14 @@ const GameDetail = () => {
               : 'linear-gradient(transparent 30%, rgba(255,255,255,0.9))',
           }}
         />
-        <div className="absolute bottom-0 left-0 p-6 md:p-10 w-full">
-          <Title level={1} style={{ color: isDark ? '#fff' : '#000', marginBottom: 8 }}>{displayName}</Title>
+        <div className="absolute bottom-0 left-0 p-4 sm:p-6 md:p-10 w-full min-w-0">
+          <Title
+            level={1}
+            className="!text-xl sm:!text-2xl md:!text-[32px] !leading-tight break-words pr-2"
+            style={{ color: isDark ? '#fff' : '#000', marginBottom: 8 }}
+          >
+            {displayName}
+          </Title>
           <Space className="flex flex-wrap gap-2">
             {game.genres?.map(g => (
               <Tag key={`genre-${g.id}`} color="blue">{g.name}</Tag>
@@ -266,7 +272,12 @@ const GameDetail = () => {
               <Image.PreviewGroup>
                 <Space size={4} className="flex flex-wrap">
                   {game.screenshots.map((screenshot, index) => (
-                    <Image key={index} src={screenshot} width={200} className="rounded" />
+                    <Image
+                      key={index}
+                      src={screenshot}
+                      className="rounded w-full max-w-[200px]"
+                      style={{ height: 'auto' }}
+                    />
                   ))}
                 </Space>
               </Image.PreviewGroup>

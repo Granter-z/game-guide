@@ -23,7 +23,7 @@ const App = () => {
   }, [theme]);
 
   const antdThemeConfig = {
-    algorithm: isDark ? antdTheme.defaultAlgorithm : antdTheme.defaultAlgorithm,
+    algorithm: isDark ? antdTheme.darkAlgorithm : antdTheme.defaultAlgorithm,
     token: {
       colorPrimary: '#ff4757',
       colorBgBase: isDark ? '#151515' : '#ffffff',

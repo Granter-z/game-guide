@@ -14,10 +14,19 @@ const useChatStore = create((set, get) => ({
       timestamp: Date.now()
     };
 
+    // 确保有活跃 session
+    const { currentSessionId } = get();
+    if (!currentSessionId) {
+      get().createSession();
+    }
+
     set(state => ({
       messages: [...state.messages, userMessage],
       isLoading: true
     }));
+
+    // 同步消息到当前 session
+    get()._syncMessagesToSession();
 
     try {
       const response = await api.post('/chat', {
@@ -47,6 +56,28 @@ const useChatStore = create((set, get) => ({
         isLoading: false
       }));
     }
+
+    // 同步最新消息到当前 session
+    get()._syncMessagesToSession();
+  },
+
+  // 将当前 messages 同步到 sessions 数组中对应的 session
+  _syncMessagesToSession: () => {
+    const { messages, currentSessionId } = get();
+    if (!currentSessionId) return;
+    set(state => ({
+      sessions: state.sessions.map(s =>
+        s.id === currentSessionId
+          ? {
+              ...s,
+              messages: [...messages],
+              title: messages.length > 0
+                ? messages[0].content.slice(0, 20) + (messages[0].content.length > 20 ? '...' : '')
+                : '新对话'
+            }
+          : s
+      )
+    }));
   },
 
   createSession: () => {
@@ -64,16 +95,46 @@ const useChatStore = create((set, get) => ({
   },
 
   switchSession: (sessionId) => {
+    const { currentSessionId } = get();
+    // 切换前先把当前消息存入旧 session
+    if (currentSessionId) {
+      get()._syncMessagesToSession();
+    }
     const session = get().sessions.find(s => s.id === sessionId);
     if (session) {
       set({
         currentSessionId: sessionId,
-        messages: session.messages
+        messages: [...(session.messages || [])]
       });
     }
   },
 
-  clearMessages: () => set({ messages: [] }),
+  deleteSession: (sessionId) => {
+    set(state => {
+      const newSessions = state.sessions.filter(s => s.id !== sessionId);
+      let newMessages = state.messages;
+      let newCurrentId = state.currentSessionId;
+      if (state.currentSessionId === sessionId) {
+        if (newSessions.length > 0) {
+          newCurrentId = newSessions[0].id;
+          newMessages = [...(newSessions[0].messages || [])];
+        } else {
+          newCurrentId = null;
+          newMessages = [];
+        }
+      }
+      return {
+        sessions: newSessions,
+        currentSessionId: newCurrentId,
+        messages: newMessages
+      };
+    });
+  },
+
+  clearMessages: () => {
+    set({ messages: [] });
+    get()._syncMessagesToSession();
+  },
 
   reset: () => set({
     messages: [],

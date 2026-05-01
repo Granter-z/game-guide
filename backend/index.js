@@ -1,6 +1,3 @@
 const app = require('./src/app');
-const connectDB = require('./src/config/db');
-
-connectDB();
-
+// connectDB 已在 app.js 中调用，此处无需重复
 module.exports = app;

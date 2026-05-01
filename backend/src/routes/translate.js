@@ -3,8 +3,8 @@ const router = express.Router();
 const axios = require('axios');
 const crypto = require('crypto');
 
-const APP_ID = '20260323002579008';
-const API_KEY = 'j9tq8e3SaKp4AqMpSxbp';
+const APP_ID = process.env.BAIDU_APP_ID || '';
+const API_KEY = process.env.BAIDU_API_KEY || '';
 
 const translateText = async (text, from = 'en', to = 'zh') => {
   if (!text || !text.trim()) return '';

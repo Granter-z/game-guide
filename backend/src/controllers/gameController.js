@@ -1,6 +1,7 @@
 const axios = require('axios');
 const { HttpsProxyAgent } = require('https-proxy-agent');
 const Game = require('../models/Game');
+const { getOfficialGameNameZh } = require('../config/officialGameNames');
 
 const RAWG_BASE_URL = 'https://api.rawg.io/api';
 
@@ -23,6 +24,7 @@ const mapRAWGToGame = (game) => ({
   gameId: game.id.toString(),
   name: game.name,
   slug: game.slug,
+  official_name_zh: getOfficialGameNameZh(game.slug),
   description: game.description_raw || game.description || '',
   backgroundImage: game.background_image,
   released: game.released,
@@ -62,6 +64,7 @@ exports.getGames = async (req, res) => {
         id: game.id,
         name: game.name,
         slug: game.slug,
+        official_name_zh: getOfficialGameNameZh(game.slug),
         background_image: game.background_image,
         released: game.released,
         metacritic: game.metacritic,
@@ -93,8 +96,10 @@ exports.getGameBySlug = async (req, res) => {
 
 exports.searchGames = async (req, res) => {
   try {
-    const { q, page = 1 } = req.query;
-    const data = await fetchFromRAWG('/games', { search: q, page: parseInt(page) });
+    const { q, page = 1, platforms } = req.query;
+    const params = { search: q, page: parseInt(page) };
+    if (platforms) params.platforms = platforms;
+    const data = await fetchFromRAWG('/games', params);
 
     res.json({
       count: data.count,

@@ -3,6 +3,6 @@
   "outputDirectory": "dist",
   "framework": "vite",
   "rewrites": [
-    { "source": "/api/(.*)", "destination": "https://your-backend-domain.com/api/$1" }
+    { "source": "/api/(.*)", "destination": "$1" }
   ]
 }

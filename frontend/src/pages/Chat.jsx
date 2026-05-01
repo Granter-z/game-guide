@@ -1,4 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Card, Input, Button, List, Avatar, Spin, Typography, Tag, message } from 'antd';
 import { SendOutlined, RobotOutlined, UserOutlined, ClearOutlined, PlusOutlined } from '@ant-design/icons';
 import useChatStore from '../store/chatStore';
@@ -8,6 +9,7 @@ const { Title, Text } = Typography;
 const { TextArea } = Input;
 
 const Chat = () => {
+  const navigate = useNavigate();
   const { theme } = useThemeStore();
   const isDark = theme === 'dark';
   const messagesEndRef = useRef(null);
@@ -103,7 +105,7 @@ const Chat = () => {
                               key={idx}
                               style={{ cursor: 'pointer', padding: '2px 6px', fontSize: 11 }}
                               color="blue"
-                              onClick={() => window.location.href = `/games/${game.slug}`}
+                              onClick={() => navigate(`/games/${game.slug}`)}
                             >
                               {game.name} {game.metacritic ? `(${game.metacritic})` : ''}
                             </Tag>

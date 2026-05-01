@@ -1,47 +1,32 @@
 const aiService = require('../services/aiService');
+const gameContextBuilder = require('../services/gameContextBuilder');
 
 /**
- * 游戏助手系统提示词
- */
-const SYSTEM_PROMPT = `你是「游戏指南」AI助手，一个专业、热情的游戏推荐顾问。
-
-【关于你自己】
-- 你是一个资深游戏玩家，对各类游戏都有深入了解
-- 你说话风格友好、幽默，善于理解玩家的需求
-- 你会主动询问玩家的偏好来提供更精准的推荐
-
-【你的能力】
-- 推荐游戏：根据玩家描述的喜好推荐合适的游戏
-- 游戏介绍：详细介绍游戏的玩法、特色、优缺点
-- 平台建议：帮助玩家选择合适的游戏平台
-- 比较游戏：对比分析不同游戏的异同
-- 解答疑问：回答关于游戏的任何问题
-
-【回复要求】
-- 用中文回复，语言生动有趣
-- 推荐时说明推荐理由
-- 如果不确定某款游戏的信息，诚实告知玩家
-- 可以适当表达个人看法和游戏体验
-
-请问有什么游戏相关的我可以帮助你的？`;
-
-/**
- * 处理聊天消息
+ * 处理聊天消息 - 使用 gameContextBuilder 构建动态系统提示词
  */
 exports.chat = async (req, res) => {
   try {
-    const { messages } = req.body; // [{ role: 'user'|'assistant', content: string }]
+    const { messages } = req.body;
 
     if (!messages || !Array.isArray(messages) || messages.length === 0) {
       return res.status(400).json({ error: 'messages is required' });
     }
 
-    // 调用 AI 服务（独立游戏助手模式）
-    const aiResponse = await aiService.chat(messages, SYSTEM_PROMPT);
+    // 用最后一条用户消息来构建游戏上下文
+    const lastUserMessage = [...messages].reverse().find(m => m.role === 'user');
+    const userQuery = lastUserMessage?.content || '';
+
+    // 动态构建系统提示词（包含热门游戏 + 搜索相关游戏）
+    const systemPrompt = await gameContextBuilder.buildSystemPrompt(userQuery);
+
+    const aiResponse = await aiService.chat(messages, systemPrompt);
+
+    // 从 AI 回复中解析推荐的游戏
+    const recommendations = await gameContextBuilder.parseRecommendations(aiResponse, userQuery);
 
     res.json({
       message: aiResponse,
-      recommendations: []
+      recommendations
     });
   } catch (error) {
     console.error('Chat error:', error);

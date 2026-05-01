@@ -12,7 +12,7 @@ export const getGames = async (params) => {
   return res;
 };
 export const getGameBySlug = (slug) => apiClient.get(`/games/${slug}`);
-export const searchGames = (query, page) => apiClient.get('/games/search', { params: { q: query, page } });
+export const searchGames = (query, page, platforms) => apiClient.get('/games/search', { params: { q: query, page, ...(platforms ? { platforms } : {}) } });
 export const getGenres = () => apiClient.get('/games/genres');
 export const getPlatforms = () => apiClient.get('/games/platforms');
 export const getGameDetails = async (id) => {

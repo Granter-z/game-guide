@@ -23,8 +23,8 @@ const GameFilter = ({ onFilterChange, loading }) => {
     const fetchFilters = async () => {
       try {
         const [genresRes, platformsRes] = await Promise.all([getGenres(), getPlatforms()]);
-        setGenres(genresRes.data?.results || []);
-        setPlatforms(platformsRes.data?.results || []);
+        setGenres(genresRes.data || []);
+        setPlatforms(platformsRes.data || []);
       } catch (error) {
         console.error('Failed to fetch filters:', error);
       }

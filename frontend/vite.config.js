@@ -11,5 +11,21 @@ export default defineConfig({
         changeOrigin: true
       }
     }
+  },
+  build: {
+    target: 'es2020',
+    minify: 'esbuild',
+    sourcemap: false,
+    chunkSizeWarningLimit: 500,
+    rollupOptions: {
+      output: {
+        manualChunks: {
+          'vendor-react': ['react', 'react-dom', 'react-router-dom'],
+          'vendor-antd': ['antd', '@ant-design/icons'],
+          'vendor-state': ['zustand'],
+          'vendor-utils': ['axios', 'dayjs'],
+        }
+      }
+    }
   }
 })

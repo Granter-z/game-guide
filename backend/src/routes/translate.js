@@ -8,6 +8,9 @@ const API_KEY = process.env.BAIDU_API_KEY || '';
 
 const translateText = async (text, from = 'en', to = 'zh') => {
   if (!text || !text.trim()) return '';
+  if (!APP_ID || !API_KEY) {
+    throw new Error('百度翻译 API 密钥未配置：请在 Railway 环境变量中设置 BAIDU_APP_ID 和 BAIDU_API_KEY');
+  }
 
   // 按句子分段翻译
   const sentences = text.match(/[^.!?]+[.!?]+/g) || [text];

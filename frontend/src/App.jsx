@@ -4,15 +4,21 @@ import { ConfigProvider, theme as antdTheme, Spin } from 'antd';
 import zhCN from 'antd/locale/zh_CN';
 import Layout from './components/Layout';
 import Home from './pages/Home';
-import GameList from './pages/GameList';
 import useThemeStore from './store/themeStore';
 
-// 懒加载页面组件
+// 懒加载页面组件 (首屏不需要的全部懒加载)
+const GameList = lazy(() => import('./pages/GameList'));
 const GameDetail = lazy(() => import('./pages/GameDetail'));
 const Search = lazy(() => import('./pages/Search'));
 const Login = lazy(() => import('./pages/Login'));
 const Profile = lazy(() => import('./pages/Profile'));
 const Chat = lazy(() => import('./pages/Chat'));
+
+const LoadingFallback = () => (
+  <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh' }}>
+    <Spin size="large" />
+  </div>
+);
 
 const App = () => {
   const { theme } = useThemeStore();
@@ -125,7 +131,7 @@ const App = () => {
   return (
     <ConfigProvider theme={antdThemeConfig} locale={zhCN}>
       <BrowserRouter>
-        <Suspense fallback={<div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh' }}><Spin size="large" /></div>}>
+        <Suspense fallback={<LoadingFallback />}>
           <Routes>
             <Route path="/" element={<Layout />}>
               <Route index element={<Home />} />

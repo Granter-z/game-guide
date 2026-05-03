@@ -7,13 +7,18 @@
     <meta name="format-detection" content="telephone=no" />
     <meta name="apple-mobile-web-app-capable" content="yes" />
     <meta name="apple-mobile-web-app-status-bar-style" content="default" />
-    <!-- 前后端不同域名且构建时未注入 VITE_API_BASE_URL 时：填写后端根路径，须以 /api 结尾，例如 https://xxx.up.railway.app/api -->
+    <meta name="description" content="Granter游戏图鉴 - 发现、收藏和讨论你喜欢的游戏" />
+    <!-- 前后端不同域名且构建时未注入 VITE_API_BASE_URL 时：填写后端根路径，须以 /api 结尾 -->
     <meta name="api-base-url" content="" />
+    <!-- DNS预解析 & 预连接 -->
+    <link rel="dns-prefetch" href="//api.rawg.io" />
+    <link rel="dns-prefetch" href="//media.rawg.io" />
+    <link rel="preconnect" href="//media.rawg.io" crossorigin />
     <title>Granter游戏图鉴</title>
   </head>
   <body>
     <div id="root"></div>
-    <!-- 同步加载：必须在 React 之前执行，供 api.js 读取 window.__GAME_GUIDE_API_BASE__ -->
+    <!-- 同步加载：必须在 React 之前执行，供 api.js 读取 -->
     <script src="/runtime-config.js"></script>
     <script type="module" src="/src/main.jsx"></script>
   </body>

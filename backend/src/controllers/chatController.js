@@ -43,7 +43,7 @@ exports.chat = async (req, res) => {
 exports.getModels = async (req, res) => {
   res.json({
     providers: [
-      { id: 'nvidia', name: 'NVIDIA NIM (Llama)', models: ['nvidia/llama-3.1-nemotron-70b-instruct'] },
+      { id: 'nvidia', name: 'NVIDIA NIM (Llama)', models: ['meta/llama-3.1-8b-instruct'] },
       { id: 'groq', name: 'Groq (Llama)', models: ['llama-3.1-8b-instant', 'llama-3.2-11b-vision'] }
     ]
   });

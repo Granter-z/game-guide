@@ -20,7 +20,6 @@ export const getGameDetails = async (id) => {
   const res = await apiClient.get(`/games/${id}`);
   return res.data;
 };
-export const getGameScreenshots = (id) => apiClient.get(`/games/${id}/screenshots`).catch(() => ({ data: { results: [] } }));
-export const getGameTrailers = (id) => apiClient.get(`/games/${id}/trailers`).catch(() => ({ data: { results: [] } }));
+// screenshots 和 trailers 已包含在 getGameBySlug 的返回数据中，无需单独请求
 
 export default apiClient;

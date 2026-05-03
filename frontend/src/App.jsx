@@ -5,6 +5,7 @@ import zhCN from 'antd/locale/zh_CN';
 import Layout from './components/Layout';
 import Home from './pages/Home';
 import useThemeStore from './store/themeStore';
+import useAuthStore from './store/authStore';
 
 // 懒加载页面组件 (首屏不需要的全部懒加载)
 const GameList = lazy(() => import('./pages/GameList'));
@@ -23,10 +24,15 @@ const LoadingFallback = () => (
 const App = () => {
   const { theme } = useThemeStore();
   const isDark = theme === 'dark';
+  const checkAuth = useAuthStore(s => s.checkAuth);
 
   useEffect(() => {
     document.documentElement.setAttribute('data-theme', theme);
   }, [theme]);
+
+  useEffect(() => {
+    checkAuth();
+  }, []);
 
   const antdThemeConfig = {
     algorithm: isDark ? antdTheme.darkAlgorithm : antdTheme.defaultAlgorithm,

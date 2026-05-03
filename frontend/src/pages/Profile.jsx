@@ -150,7 +150,7 @@ const Profile = () => {
                       <Card key={index} size="small">
                         <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
                           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: 8 }}>
-                            <h4 style={{ color: textColor, fontWeight: 600, margin: 0 }}>{rating.gameId}</h4>
+                            <h4 style={{ color: textColor, fontWeight: 600, margin: 0 }}>{rating.gameName || rating.gameId}</h4>
                             <Rate disabled value={rating.score} style={{ fontSize: 12 }} />
                           </div>
                           <p style={{ color: textSecondary, fontSize: 13, margin: 0 }}>{rating.comment || '无评论'}</p>

@@ -62,8 +62,8 @@ class AIService {
 
   async chatWithGroq(messages) {
     const apiKey = process.env.GROQ_API_KEY;
-    if (!apiKey) {
-      throw new Error('GROQ_API_KEY not configured');
+    if (!apiKey || apiKey.startsWith('gsk_xxx')) {
+      throw new Error('GROQ_API_KEY not configured (placeholder detected)');
     }
 
     const agent = this.getAgent();
